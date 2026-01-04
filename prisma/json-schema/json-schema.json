@@ -1,0 +1,92 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "definitions": {
+    "Zone": {
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "slug": { "type": "string" },
+        "name": { "type": "string" },
+        "description": { "type": "string" },
+        "image": { "type": "string" },
+        "price": { "type": "string" },
+        "color": { "type": "string" },
+        "createdAt": { "type": "string", "format": "date-time" },
+        "updatedAt": { "type": "string", "format": "date-time" },
+        "specs": {
+          "type": "array",
+          "items": { "$ref": "#/definitions/ZoneSpec" }
+        },
+        "components": {
+          "type": "array",
+          "items": { "$ref": "#/definitions/ZoneComponent" }
+        },
+        "devices": {
+          "type": "array",
+          "items": { "$ref": "#/definitions/ZoneDevice" }
+        },
+        "photos": {
+          "type": "array",
+          "items": { "$ref": "#/definitions/ZonePhoto" }
+        }
+      },
+      "required": ["slug", "name", "description", "image", "price", "color"]
+    },
+    "ZoneSpec": {
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "name": { "type": "string" },
+        "zoneId": { "type": "string" },
+        "zone": { "$ref": "#/definitions/Zone" }
+      },
+      "required": ["name", "zoneId"]
+    },
+    "ZoneComponent": {
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "category": { "type": "string" },
+        "name": { "type": "string" },
+        "model": { "type": "string" },
+        "specs": { "type": "string" },
+        "zoneId": { "type": "string" },
+        "zone": { "$ref": "#/definitions/Zone" }
+      },
+      "required": ["category", "name", "model", "specs", "zoneId"]
+    },
+    "ZoneDevice": {
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "category": { "type": "string" },
+        "name": { "type": "string" },
+        "model": { "type": "string" },
+        "specs": { "type": "string" },
+        "zoneId": { "type": "string" },
+        "zone": { "$ref": "#/definitions/Zone" }
+      },
+      "required": ["category", "name", "model", "specs", "zoneId"]
+    },
+    "ZonePhoto": {
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "url": { "type": "string" },
+        "alt": { "type": "string" },
+        "order": { "type": "integer", "default": 0 },
+        "zoneId": { "type": "string" },
+        "zone": { "$ref": "#/definitions/Zone" }
+      },
+      "required": ["url", "alt", "zoneId"]
+    }
+  },
+  "type": "object",
+  "properties": {
+    "zone": { "$ref": "#/definitions/Zone" },
+    "zoneSpec": { "$ref": "#/definitions/ZoneSpec" },
+    "zoneComponent": { "$ref": "#/definitions/ZoneComponent" },
+    "zoneDevice": { "$ref": "#/definitions/ZoneDevice" },
+    "zonePhoto": { "$ref": "#/definitions/ZonePhoto" }
+  }
+}
