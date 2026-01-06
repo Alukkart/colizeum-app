@@ -9,8 +9,6 @@
     "lint": "eslint ."
   },
   "dependencies": {
-    "@hookform/resolvers": "^3.10.0",
-    "@premieroctet/next-admin": "^8.4.2",
     "@prisma/adapter-pg": "^7.2.0",
     "@prisma/client": "^7.2.0",
     "@radix-ui/react-accordion": "1.2.2",
@@ -53,7 +51,6 @@
     "zod": "3.25.76"
   },
   "devDependencies": {
-    "@premieroctet/next-admin-generator-prisma": "^1.1.0",
     "@tailwindcss/postcss": "^4.1.9",
     "@types/node": "^22.19.3",
     "@types/react": "^19",
