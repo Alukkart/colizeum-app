@@ -4,9 +4,7 @@ import {useState, useEffect} from "react"
 import {
     Trophy,
     Target,
-    Clock,
     TrendingUp,
-    Calendar,
     Medal,
     Gamepad2,
     ChevronRight,
@@ -51,8 +49,6 @@ export function PlayerProfile({username}: { username: string }) {
         setIsVisible(true)
     }, [])
 
-    console.log("Player data:", player, isLoading)
-
     if (!isLoading && !player) {
         notFound()
     }
@@ -69,7 +65,7 @@ export function PlayerProfile({username}: { username: string }) {
                 <div className="h-64 md:h-80 overflow-hidden">
                     <img src={"/placeholder.svg"} alt="Banner" className="w-full h-full object-cover"/>
                     <div
-                        className="absolute inset-0 bg-gradient-to-t from-background via-background/50 to-transparent"/>
+                        className="absolute inset-0 bg-linear-to-t from-background via-background/50 to-transparent"/>
                 </div>
 
                 {/* Profile Info Overlay */}
@@ -305,18 +301,18 @@ export function PlayerProfile({username}: { username: string }) {
                                         {/* Gradient Background */}
                                         <div
                                             className={cn(
-                                                "absolute inset-0 opacity-10 bg-gradient-to-br",
+                                                "absolute inset-0 opacity-10 bg-linear-to-br",
                                                 rarityColors[achievement.rarity as keyof typeof rarityColors],
                                             )}
                                         />
                                         <div className="relative flex items-center gap-4">
                                             <div
                                                 className={cn(
-                                                    "w-12 h-12 rounded-xl flex items-center justify-center bg-gradient-to-br",
+                                                    "w-12 h-12 rounded-xl flex items-center justify-center bg-linear-to-br",
                                                     rarityColors[achievement.rarity as keyof typeof rarityColors],
                                                 )}
                                             >
-                                                {achievement.icon && <achievement.icon className="w-6 h-6 text-white"/>}
+                                                {achievement.icon && <achievement.icon/>}
                                             </div>
                                             <div>
                                                 <div className="font-semibold text-foreground">{achievement.name}</div>
@@ -369,12 +365,12 @@ export function PlayerProfile({username}: { username: string }) {
                                     <div
                                         key={achievement.id}
                                         className={cn(
-                                            "w-10 h-10 rounded-lg flex items-center justify-center bg-gradient-to-br",
+                                            "w-10 h-10 rounded-lg flex items-center justify-center bg-linear-to-br",
                                             rarityColors[achievement.rarity as keyof typeof rarityColors],
                                         )}
                                         title={achievement.name}
                                     >
-                                        {achievement.icon && <achievement.icon className="w-5 h-5 text-white"/>}
+                                        {achievement.icon && <achievement.icon/>}
                                     </div>
                                 ))}
                                 {player.achievements && player.achievements.length > 4 && (

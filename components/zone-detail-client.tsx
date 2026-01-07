@@ -16,8 +16,10 @@ import {
 } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
+import useSWR from "swr";
+import {notFound} from "next/navigation";
 
-type ZoneWithRelations = {
+export type ZoneWithRelations = {
   id: string
   slug: string
   name: string
@@ -52,9 +54,21 @@ const categoryLabels: Record<string, string> = {
   headset: "Наушники",
 }
 
-export function ZoneDetailClient({ zone }: { zone: ZoneWithRelations }) {
+const fetcher = (url: string) => fetch(url).then((res) => res.json())
+
+
+export function ZoneDetailClient({ slug }: { slug: string }) {
   const [lightboxOpen, setLightboxOpen] = useState(false)
   const [currentPhotoIndex, setCurrentPhotoIndex] = useState(0)
+  const {data: zone, isLoading} = useSWR<ZoneWithRelations>(`/api/zone/${slug}`, fetcher)
+
+  if (!zone && !isLoading) {
+    return notFound()
+  }
+
+  if (isLoading || !zone) {
+    return <div className="py-32 text-center text-muted-foreground">Загрузка...</div>
+  }
 
   const openLightbox = (index: number) => {
     setCurrentPhotoIndex(index)

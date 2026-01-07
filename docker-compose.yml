@@ -1,20 +1,41 @@
-# Use postgres/example user/password credentials
-version: '3.9'
+name: colizeum_stack
 
-name: postgres
 services:
+  # ---------------------------------------------------------------------------
+  # PostgreSQL (общий)
   postgres:
-    restart: always
     image: postgres:latest
-    container_name: postgreSQL_db
+    container_name: postgres_db
+    restart: always
     environment:
-      POSTGRES_USER: user
+      POSTGRES_USER: root
       POSTGRES_PASSWORD: root
       POSTGRES_DB: postgres
     ports:
       - "5432:5432"
-    command: -p 5432
     volumes:
       - postgres:/data/postgres
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U root"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # ---------------------------------------------------------------------------
+  # Next.js
+  nextjs:
+    container_name: nextjs_app
+    build:
+      context: .
+      dockerfile: Dockerfile
+    restart: always
+    ports:
+      - "3000:3000"
+    environment:
+      DATABASE_URL: postgres://root:root@postgres:5432/postgres
+    depends_on:
+      postgres:
+        condition: service_healthy
+
 volumes:
-    postgres:
+  postgres:

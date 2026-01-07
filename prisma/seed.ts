@@ -1,4 +1,4 @@
-import { PrismaClient } from '../prisma/generated/client'
+import { PrismaClient } from '@/prisma/generated/client'
 import {PrismaPg} from "@prisma/adapter-pg";
 const adapter = new PrismaPg({
     connectionString: process.env.DATABASE_URL,
@@ -7,10 +7,17 @@ const adapter = new PrismaPg({
 const prisma = new PrismaClient({adapter})
 
 async function main() {
-    console.log('🌱 Start seeding...')
+    console.log('🧹 Clearing database before seeding...')
+    await prisma.match.deleteMany({})
+    await prisma.news.deleteMany({})
+    await prisma.player.deleteMany({})
+    await prisma.zone.deleteMany({})
+    await prisma.tournament.deleteMany({})
 
+    console.log('🧹 Database cleared')
+    console.log('🌱 Start seeding...')
     /* -------------------- ZONES -------------------- */
-    const zone = await prisma.zone.create({
+    await prisma.zone.create({
         data: {
             slug: 'pro-zone',
             name: 'Pro Gaming Zone',
