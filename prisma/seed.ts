@@ -1,7 +1,8 @@
 import { PrismaClient } from '@/prisma/generated/client'
 import {PrismaPg} from "@prisma/adapter-pg";
+import {databaseUrl} from "@/prisma.config";
 const adapter = new PrismaPg({
-    connectionString: process.env.DATABASE_URL,
+    connectionString: databaseUrl,
 })
 
 const prisma = new PrismaClient({adapter})
@@ -19,38 +20,26 @@ async function main() {
     /* -------------------- ZONES -------------------- */
     await prisma.zone.create({
         data: {
-            slug: 'pro-zone',
-            name: 'Pro Gaming Zone',
+            slug: 'bootcamp',
+            name: 'Bootcamp',
             description: 'Профессиональная игровая зона для турниров',
-            image: '/zones/pro.jpg',
+            image: '/bootcamp.jpg',
             price: '1500₽ / час',
             color: '#ff3b3b',
-
-            specs: {
-                create: [
-                    { name: 'RTX 4070' },
-                    { name: 'Intel i7 13700K' },
-                    { name: '32GB DDR5' },
-                ],
-            },
-
             components: {
                 create: [
                     {
                         category: 'gpu',
-                        name: 'NVIDIA',
                         model: 'RTX 4070',
                         specs: '12GB GDDR6X',
                     },
                     {
                         category: 'cpu',
-                        name: 'Intel',
                         model: 'i7 13700K',
                         specs: '16 cores',
                     },
                     {
                         category: 'monitor',
-                        name: 'ASUS',
                         model: 'ROG Swift',
                         specs: '240Hz, 27"',
                     },
@@ -61,19 +50,16 @@ async function main() {
                 create: [
                     {
                         category: 'keyboard',
-                        name: 'SteelSeries',
                         model: 'Apex Pro',
                         specs: 'Mechanical',
                     },
                     {
                         category: 'mouse',
-                        name: 'Logitech',
                         model: 'G Pro X',
                         specs: 'Wireless',
                     },
                     {
                         category: 'headset',
-                        name: 'HyperX',
                         model: 'Cloud II',
                         specs: '7.1 Surround',
                     },
@@ -83,15 +69,10 @@ async function main() {
             photos: {
                 create: [
                     {
-                        url: '/zones/pro-1.jpg',
+                        url: '/bootcamp.jpg',
                         alt: 'Pro Zone',
                         order: 1,
-                    },
-                    {
-                        url: '/zones/pro-2.jpg',
-                        alt: 'Pro Zone Interior',
-                        order: 2,
-                    },
+                    }
                 ],
             },
         },
