@@ -1,36 +1,153 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Colizeum app
 
-## Getting Started
+---
 
-First, run the development server:
+## Требования
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+Перед началом убедитесь, что у вас установлены:
+
+* **Docker** >= 20.x
+* **Docker Compose** >= 2.x
+* **Node.js** >= 20.x (опционально, если запускать без Docker)
+
+---
+
+## Структура проекта (пример)
+
+```text
+.
+├── app/                        # Next.js
+├── prisma/
+│   ├── schema.prisma           # Схема БД
+│   └── seed.ts                 # Скрипт заполнения БД
+├── docker-compose.yml
+├── mathesar.docker-compose.yml
+├── Dockerfile
+├── package.json
+├── .env
+└── README.md
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+---
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Переменные окружения
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+Создайте файл `.env` в корне проекта:
 
-## Learn More
+```env
+POSTGRES_USER=root
+POSTGRES_PASSWORD=root
+POSTGRES_DB=postgres
+#local
+#POSTGRES_HOST=127.0.0.1
+#prod
+POSTGRES_HOST=postgres
+POSTGRES_PORT=5432
+```
 
-To learn more about Next.js, take a look at the following resources:
+---
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## Запуск проекта через Docker Compose
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+### 1. Запуск основных сервисов
 
-## Deploy on Vercel
+```bash
+docker compose up -d
+```
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+или (если используется старый синтаксис):
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+```bash
+docker-compose up -d
+```
+
+После запуска приложение будет доступно по адресу:
+
+```
+http://localhost:3000
+```
+
+---
+
+### 2. Запуск дополнительных сервисов (mathesar)
+
+Если требуется поднять дополнительные сервисы из `mathesar.docker-compose.yml`:
+
+```bash
+docker compose -f mathesar.docker-compose.yml up -d
+```
+
+---
+
+## Prisma
+
+### Prisma Push (применение схемы к БД)
+
+Для применения схемы Prisma к базе данных используется команда **`prisma db push`**.
+
+```bash
+npx prisma db push
+```
+
+Что бы команда выполнилась успешно, убедитесь, что prisma.config.ts настроен правильно и указывает на вашу базу данных.
+
+---
+
+### Prisma Seed (заполнение базы данными)
+
+```bash
+npx prisma db seed
+```
+
+---
+
+## Полный сценарий инициализации проекта
+
+```bash
+docker compose up -d
+npx prisma db push
+npx prisma db seed
+```
+
+---
+
+## Полезные команды
+
+Остановить контейнеры:
+
+```bash
+docker compose down
+```
+
+Пересобрать образы:
+
+```bash
+docker compose build
+```
+
+Посмотреть логи:
+
+```bash
+docker compose logs -f
+```
+
+---
+
+## Используемые технологии
+
+* **Next.js**
+* **React**
+* **Prisma**
+* **PostgreSQL**
+* **Docker / Docker Compose**
+
+---
+
+## Примечания
+
+* Не коммитьте `.env` в репозиторий
+* Перед выполнением `seed` убедитесь, что схема БД применена (`db push`)
+* `seed` очищает бд перед заполнением
+* Если меняется `schema.prisma`, необходимо повторно выполнить `prisma db push`
+
+---
