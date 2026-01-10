@@ -3,14 +3,8 @@
 import {useState, useRef, useEffect} from "react"
 import Link from "next/link"
 import {cn} from "@/lib/utils"
-import {Check, Monitor, Cpu, Headphones, ArrowRight, Loader2} from "lucide-react"
+import {Monitor, Headphones, ArrowRight, Loader2, Gpu} from "lucide-react"
 import useSWR from "swr"
-
-interface ZoneSpec {
-    id: number
-    label: string
-    value: string
-}
 
 interface Zone {
     id: number
@@ -20,7 +14,6 @@ interface Zone {
     image: string
     price: string
     color: string
-    specs: ZoneSpec[]
 }
 
 const fetcher = (url: string) => fetch(url).then((res) => res.json())
@@ -31,7 +24,6 @@ export function ZonesSection() {
     const [isHovered, setIsHovered] = useState<string | null>(null)
     const sectionRef = useRef<HTMLDivElement>(null)
     const [isVisible, setIsVisible] = useState(false)
-
 
     useEffect(() => {
         const observer = new IntersectionObserver(
@@ -49,13 +41,6 @@ export function ZonesSection() {
 
         return () => observer.disconnect()
     }, [])
-
-    const getSpecValues = (zone: Zone) => {
-        if (zone.specs && zone.specs.length > 0) {
-            return zone.specs.map((s) => s.value)
-        }
-        return []
-    }
 
     return (
         <section id="zones" ref={sectionRef} className="relative py-32 bg-card">
@@ -130,18 +115,6 @@ export function ZonesSection() {
                                                     className="w-5 h-5 text-primary opacity-0 group-hover:opacity-100 transition-all duration-300 group-hover:translate-x-1"/>
                                             </div>
                                             <p className="text-muted-foreground text-sm mb-6">{zone.description}</p>
-
-                                            {/* Specs */}
-                                            <ul className="space-y-3">
-                                                {getSpecValues(zone)
-                                                    .slice(0, 4)
-                                                    .map((spec, idx) => (
-                                                        <li key={idx} className="flex items-center gap-3 text-sm">
-                                                            <Check className="w-4 h-4 text-primary shrink-0"/>
-                                                            <span className="text-secondary-foreground">{spec}</span>
-                                                        </li>
-                                                    ))}
-                                            </ul>
                                         </div>
 
                                         {/* Hover Glow */}
@@ -170,7 +143,7 @@ export function ZonesSection() {
                 >
                     {[
                         {icon: Monitor, label: "4K Мониторы", desc: "До 360Hz"},
-                        {icon: Cpu, label: "RTX 4000", desc: "Серия видеокарт"},
+                        {icon: Gpu, label: "RTX 4000", desc: "Серия видеокарт"},
                         {icon: Headphones, label: "Шумоподавление", desc: "Премиум аудио"},
                     ].map((feature) => (
                         <div key={feature.label} className="text-center group">

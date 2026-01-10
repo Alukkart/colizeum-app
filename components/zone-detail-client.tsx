@@ -6,13 +6,12 @@ import {
     ArrowLeft,
     Monitor,
     Cpu,
-    HardDrive,
     Keyboard,
     Mouse,
     Headphones,
     X,
     ChevronLeft,
-    ChevronRight,
+    ChevronRight, Gpu,
 } from "lucide-react"
 import {cn} from "@/lib/utils"
 import {Button} from "@/components/ui/button"
@@ -35,7 +34,7 @@ export type ZoneWithRelations = {
 }
 
 const componentIcons: Record<string, typeof Monitor> = {
-    gpu: HardDrive,
+    gpu: Gpu,
     cpu: Cpu,
     monitor: Monitor,
 }
@@ -136,7 +135,7 @@ export function ZoneDetailClient({slug}: { slug: string }) {
                                 </h2>
                                 <div className="space-y-4">
                                     {zone.components && zone.components.map((component) => {
-                                        const Icon = componentIcons[component.category] || HardDrive
+                                        const Icon = componentIcons[component.category] || Gpu
                                         return (
                                             <div
                                                 key={component.id}
