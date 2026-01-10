@@ -27,9 +27,8 @@ model Zone {
   description String
   image       String
   price       String
-  color       String
   createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  updatedAt   DateTime @default(now())
 
   // Relations
   components ZoneComponent[]
@@ -40,6 +39,7 @@ model Zone {
 model ZoneComponent {
   id       String @id @default(cuid())
   category ComponentCategory // "gpu", "cpu", "monitor"
+  order    Int    @default(0)
   model    String
   specs    String
   zoneId   String
@@ -49,6 +49,7 @@ model ZoneComponent {
 model ZoneDevice {
   id       String @id @default(cuid())
   category DeviceCategory // "keyboard", "mouse", "headset"
+  order    Int    @default(0)
   model    String
   specs    String
   zoneId   String
