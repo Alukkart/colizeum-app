@@ -5,7 +5,6 @@ import { TournamentsSection } from "@/components/tournaments-section"
 import { RankingsSection } from "@/components/rankings-section"
 import { NewsSection } from "@/components/news-section"
 import { ContactsSection } from "@/components/contacts-section"
-import { Footer } from "@/components/footer"
 
 export default function HomePage() {
   return (
@@ -17,7 +16,6 @@ export default function HomePage() {
       <RankingsSection />
       <NewsSection />
       <ContactsSection />
-      <Footer />
     </main>
   )
 }

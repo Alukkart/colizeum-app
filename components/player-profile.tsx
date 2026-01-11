@@ -3,7 +3,6 @@
 import {useState, useEffect} from "react"
 import {
     Trophy,
-    Target,
     TrendingUp,
     Medal,
     Gamepad2,
@@ -43,7 +42,7 @@ export function PlayerProfile({username}: { username: string }) {
     const {data: player, isLoading} = useSWR<PlayerProfile>(`/api/players/${username}`, fetcher)
 
     const [isVisible, setIsVisible] = useState(false)
-    const [activeTab, setActiveTab] = useState<"stats" | "matches" | "tournaments" | "achievements">("stats")
+    const [activeTab, setActiveTab] = useState<"tournaments" | "achievements">("tournaments")
 
     useEffect(() => {
         setIsVisible(true)
@@ -99,17 +98,12 @@ export function PlayerProfile({username}: { username: string }) {
                             </div>
                         </div>
 
-                        {/* Player Info */}
-                        {/*<div className="flex-1 pb-2">*/}
-                        {/*    <div className="flex flex-wrap items-center gap-3 mb-2">*/}
-                        {/*        <h1 className="text-3xl md:text-4xl font-black text-foreground">{player.nickname}</h1>*/}
-                        {/*        <span className="px-3 py-1 bg-primary/20 text-primary text-sm font-medium rounded-full">*/}
-                        {/*          Уровень {player.level}*/}
-                        {/*        </span>*/}
-                        {/*    </div>*/}
-                        {/*    <p className="text-muted-foreground mb-3">{player.realName}</p>*/}
-                        {/*    <p className="text-secondary-foreground max-w-xl">{player.bio}</p>*/}
-                        {/*</div>*/}
+                         {/*Player Info*/}
+                        <div className="flex-1 pb-2">
+                            <div className="flex flex-wrap items-center gap-3 mb-2">
+                                <h1 className="text-3xl md:text-4xl font-black text-foreground">{player.nickname}</h1>
+                            </div>
+                        </div>
 
                         {/* Quick Stats */}
                         <div className="flex gap-6 pb-2">
@@ -117,17 +111,6 @@ export function PlayerProfile({username}: { username: string }) {
                                 <div className="text-2xl md:text-3xl font-black text-primary">{player.rating}</div>
                                 <div className="text-xs text-muted-foreground uppercase tracking-wider">Рейтинг</div>
                             </div>
-                            {/*<div className="text-center">*/}
-                            {/*    <div*/}
-                            {/*        className="text-2xl md:text-3xl font-black text-foreground">{player.stats.wins}</div>*/}
-                            {/*    <div className="text-xs text-muted-foreground uppercase tracking-wider">Побед</div>*/}
-                            {/*</div>*/}
-                            {/*<div className="text-center">*/}
-                            {/*    <div*/}
-                            {/*        className="text-2xl md:text-3xl font-black text-foreground">{player.stats.winRate}%*/}
-                            {/*    </div>*/}
-                            {/*    <div className="text-xs text-muted-foreground uppercase tracking-wider">Винрейт</div>*/}
-                            {/*</div>*/}
                         </div>
                     </div>
                 </div>
@@ -142,7 +125,6 @@ export function PlayerProfile({username}: { username: string }) {
                     }`}
                 >
                     {[
-                        {value: "stats", label: "Статистика", icon: Target},
                         {value: "tournaments", label: "Турниры", icon: Trophy},
                         {value: "achievements", label: "Достижения", icon: Medal},
                     ].map((tab) => (
@@ -169,85 +151,6 @@ export function PlayerProfile({username}: { username: string }) {
                             isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-10"
                         }`}
                     >
-                        {/* Stats Tab */}
-                        {activeTab === "stats" && (
-                            <div className="space-y-6">
-                                {/* Main Stats Grid */}
-                                {/*<div className="grid grid-cols-2 md:grid-cols-4 gap-4">*/}
-                                {/*    {[*/}
-                                {/*        {label: "K/D", value: player.stats.kd, icon: Swords, color: "text-red-400"},*/}
-                                {/*        {*/}
-                                {/*            label: "Хэдшоты",*/}
-                                {/*            value: `${player.stats.hsPercent}%`,*/}
-                                {/*            icon: Target,*/}
-                                {/*            color: "text-amber-400"*/}
-                                {/*        },*/}
-                                {/*        {*/}
-                                {/*            label: "Клатчи",*/}
-                                {/*            value: player.stats.clutches,*/}
-                                {/*            icon: Shield,*/}
-                                {/*            color: "text-blue-400"*/}
-                                {/*        },*/}
-                                {/*        {label: "MVP", value: player.stats.mvps, icon: Star, color: "text-purple-400"},*/}
-                                {/*    ].map((stat) => (*/}
-                                {/*        <div*/}
-                                {/*            key={stat.label}*/}
-                                {/*            className="group p-5 bg-card rounded-xl border border-border hover:border-primary/50 transition-all duration-300"*/}
-                                {/*        >*/}
-                                {/*            <stat.icon*/}
-                                {/*                className={cn("w-6 h-6 mb-3 group-hover:scale-110 transition-transform", stat.color)}*/}
-                                {/*            />*/}
-                                {/*            <div className="text-2xl font-black text-foreground">{stat.value}</div>*/}
-                                {/*            <div className="text-sm text-muted-foreground">{stat.label}</div>*/}
-                                {/*        </div>*/}
-                                {/*    ))}*/}
-                                {/*</div>*/}
-
-                                {/* Detailed Stats */}
-                                {/*<div className="p-6 bg-card rounded-xl border border-border">*/}
-                                {/*    <h3 className="text-lg font-bold text-foreground mb-6">Детальная статистика</h3>*/}
-                                {/*    <div className="grid grid-cols-2 md:grid-cols-3 gap-6">*/}
-                                {/*        {[*/}
-                                {/*            {label: "Всего убийств", value: player.stats.kills.toLocaleString()},*/}
-                                {/*            {label: "Всего смертей", value: player.stats.deaths.toLocaleString()},*/}
-                                {/*            {label: "Хэдшоты", value: player.stats.headshots.toLocaleString()},*/}
-                                {/*            {label: "Средний счёт", value: player.stats.avgScore},*/}
-                                {/*            {label: "Побед", value: player.stats.wins},*/}
-                                {/*            {label: "Поражений", value: player.stats.losses},*/}
-                                {/*        ].map((stat) => (*/}
-                                {/*            <div key={stat.label} className="flex flex-col">*/}
-                                {/*                <span className="text-sm text-muted-foreground mb-1">{stat.label}</span>*/}
-                                {/*                <span className="text-xl font-bold text-foreground">{stat.value}</span>*/}
-                                {/*            </div>*/}
-                                {/*        ))}*/}
-                                {/*    </div>*/}
-                                {/*</div>*/}
-
-                                {/* Games */}
-                                <div className="p-6 bg-card rounded-xl border border-border">
-                                    <h3 className="text-lg font-bold text-foreground mb-6">Игры</h3>
-                                    {/*<div className="space-y-4">*/}
-                                    {/*    {player.games.map((game) => (*/}
-                                    {/*        <div*/}
-                                    {/*            key={game.name}*/}
-                                    {/*            className="flex items-center justify-between p-4 bg-secondary/50 rounded-lg hover:bg-secondary transition-colors"*/}
-                                    {/*        >*/}
-                                    {/*            <div>*/}
-                                    {/*                <div className="font-semibold text-foreground">{game.name}</div>*/}
-                                    {/*                <div className="text-sm text-muted-foreground">{game.hours} часов*/}
-                                    {/*                </div>*/}
-                                    {/*            </div>*/}
-                                    {/*            <div*/}
-                                    {/*                className="px-3 py-1.5 bg-primary/20 text-primary text-sm font-medium rounded-full">*/}
-                                    {/*                {game.rank}*/}
-                                    {/*            </div>*/}
-                                    {/*        </div>*/}
-                                    {/*    ))}*/}
-                                    {/*</div>*/}
-                                </div>
-                            </div>
-                        )}
-
                         {/* Tournaments Tab */}
                         {activeTab === "tournaments" && (
                             <div className="p-6 bg-card rounded-xl border border-border">
