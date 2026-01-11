@@ -5,7 +5,6 @@ import {
     Trophy,
     TrendingUp,
     Medal,
-    Gamepad2,
     ChevronRight,
 } from "lucide-react"
 import {cn} from "@/lib/utils"
@@ -21,7 +20,7 @@ const rarityColors = {
     common: "from-gray-400 to-gray-500",
 }
 
-interface TournamentFull extends TournamentPlayer{
+interface TournamentFull extends TournamentPlayer {
     tournament: Tournament
 }
 
@@ -85,7 +84,7 @@ export function PlayerProfile({username}: { username: string }) {
                             </div>
                         </div>
 
-                         {/*Player Info*/}
+                        {/*Player Info*/}
                         <div className="flex-1 pb-2">
                             <div className="flex flex-wrap items-center gap-3 mb-2">
                                 <h1 className="text-3xl md:text-4xl font-black text-foreground">{player.nickname}</h1>
@@ -171,7 +170,8 @@ export function PlayerProfile({username}: { username: string }) {
                                                 </div>
                                             </div>
                                             <div className="text-right">
-                                                <div className="font-bold text-primary">{tournament.tournament.prize}</div>
+                                                <div
+                                                    className="font-bold text-primary">{tournament.tournament.prize}</div>
                                                 <div className="text-xs text-muted-foreground">Приз</div>
                                             </div>
                                         </div>
@@ -183,7 +183,7 @@ export function PlayerProfile({username}: { username: string }) {
                         {/* Achievements Tab */}
                         {activeTab === "achievements" && (
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                { player.achievements && player.achievements.length > 0 && player.achievements.map((achievement) => (
+                                {player.achievements && player.achievements.length > 0 && player.achievements.map((achievement) => (
                                     <div
                                         key={achievement.id}
                                         className="group relative p-5 bg-card rounded-xl border border-border hover:border-primary/50 transition-all duration-300 overflow-hidden"
@@ -223,20 +223,11 @@ export function PlayerProfile({username}: { username: string }) {
                         {/* Info Card */}
                         <div className="p-6 bg-card rounded-xl border border-border">
                             <h3 className="text-lg font-bold text-foreground mb-4">Информация</h3>
-                            <div className="space-y-4">
-                                <div className="flex items-center gap-3">
-                                    <Gamepad2 className="w-5 h-5 text-muted-foreground"/>
-                                    <div>
-                                        <div className="text-sm text-muted-foreground">Основная игра</div>
-                                        <div className="font-medium text-foreground">{player.mainGame}</div>
-                                    </div>
-                                </div>
-                                <div className="flex items-center gap-3">
-                                    <TrendingUp className="w-5 h-5 text-muted-foreground"/>
-                                    <div>
-                                        <div className="text-sm text-muted-foreground">Рейтинг</div>
-                                        <div className="font-medium text-primary">#{player.rank} в клубе</div>
-                                    </div>
+                            <div className="flex items-center gap-3">
+                                <TrendingUp className="w-5 h-5 text-muted-foreground"/>
+                                <div>
+                                    <div className="text-sm text-muted-foreground">Рейтинг</div>
+                                    <div className="font-medium text-primary">#{player.rank} в клубе</div>
                                 </div>
                             </div>
                         </div>
