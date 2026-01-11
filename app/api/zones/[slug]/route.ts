@@ -19,8 +19,8 @@ export async function GET(request: Request, { params }: { params: Promise<{ slug
         const zone = await prisma.zone.findUnique({
             where: { slug },
             include: {
-                components: true,
-                devices: true,
+                components: { orderBy: { order: "asc" } },
+                devices: { orderBy: { order: "asc" } },
                 photos: { orderBy: { order: "asc" } },
             }
         })

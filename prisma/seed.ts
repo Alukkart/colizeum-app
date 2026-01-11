@@ -25,23 +25,25 @@ async function main() {
             description: 'Профессиональная игровая зона для турниров',
             image: '/bootcamp.jpg',
             price: '1500₽ / час',
-            color: '#ff3b3b',
             components: {
                 create: [
                     {
                         category: 'gpu',
                         model: 'RTX 4070',
                         specs: '12GB GDDR6X',
+                        order: 1
                     },
                     {
                         category: 'cpu',
                         model: 'i7 13700K',
                         specs: '16 cores',
+                        order: 2
                     },
                     {
                         category: 'monitor',
                         model: 'ROG Swift',
                         specs: '240Hz, 27"',
+                        order: 3
                     },
                 ],
             },
@@ -52,16 +54,19 @@ async function main() {
                         category: 'keyboard',
                         model: 'Apex Pro',
                         specs: 'Mechanical',
+                        order: 2
                     },
                     {
                         category: 'mouse',
                         model: 'G Pro X',
                         specs: 'Wireless',
+                        order: 1
                     },
                     {
                         category: 'headset',
                         model: 'Cloud II',
                         specs: '7.1 Surround',
+                        order: 3
                     },
                 ],
             },
@@ -84,10 +89,7 @@ async function main() {
             username: 'player_one',
             nickname: 'OneTap',
             email: 'one@mail.com',
-            mainGame: 'CS2',
             rating: 1450,
-            status: 'ONLINE',
-
             achievements: {
                 create: [
                     {
@@ -122,9 +124,7 @@ async function main() {
         data: {
             username: 'player_two',
             nickname: 'ClutchKing',
-            mainGame: 'CS2',
             rating: 1380,
-            status: 'OFFLINE',
         },
     })
 
@@ -139,7 +139,7 @@ async function main() {
             time: '18:00',
             prize: '100 000 ₽',
             maxParticipants: 16,
-            image: '/tournaments/cs2.jpg',
+            image: '/cs2-esports-tournament-dark.jpg',
 
             participants: {
                 create: [

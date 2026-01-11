@@ -6,17 +6,7 @@ export async function GET() {
         const zones = await prisma.zone.findMany({
             orderBy: {
                 price: 'asc',
-            },
-            select: {
-                id: true,
-                slug: true,
-                name: true,
-                description: true,
-                image: true,
-                price: true,
-                color: true,
-                createdAt: true,
-            },
+            }
         })
 
         console.log("Fetched zones:", zones)
