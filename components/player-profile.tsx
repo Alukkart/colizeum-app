@@ -21,12 +21,6 @@ const rarityColors = {
     common: "from-gray-400 to-gray-500",
 }
 
-const statusColors = {
-    online: "bg-green-500",
-    offline: "bg-gray-500",
-    ingame: "bg-amber-500",
-}
-
 interface TournamentFull extends TournamentPlayer{
     tournament: Tournament
 }
@@ -84,13 +78,6 @@ export function PlayerProfile({username}: { username: string }) {
                                     className="w-full h-full object-cover"
                                 />
                             </div>
-                            {/* Status Indicator */}
-                            <span
-                                className={cn(
-                                    "absolute bottom-2 right-2 w-5 h-5 rounded-full border-4 border-background",
-                                    statusColors[player.status as keyof typeof statusColors],
-                                )}
-                            />
                             {/* Rank Badge */}
                             <div
                                 className="absolute -top-2 -right-2 px-3 py-1 bg-primary text-primary-foreground text-sm font-bold rounded-full">

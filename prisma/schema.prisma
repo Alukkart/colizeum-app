@@ -101,18 +101,7 @@ model Player {
   nickname    String
   email       String?      @unique
   avatar      String?
-  bio         String?
-  mainGame    String?
   rating      Int          @default(1000)
-  wins        Int          @default(0)
-  losses      Int          @default(0)
-  kills       Int          @default(0)
-  deaths      Int          @default(0)
-  headshots   Int          @default(0)
-  clutches    Int          @default(0)
-  hoursPlayed Int          @default(0)
-  status      PlayerStatus @default(OFFLINE)
-  trend       PlayerTrend  @default(STABLE)
   rank        Int?
   createdAt   DateTime     @default(now())
   updatedAt   DateTime     @updatedAt
@@ -124,19 +113,6 @@ model Player {
   matchesWon       Match[]             @relation("WinnerMatches")
   achievements     PlayerAchievement[]
   socialLinks      PlayerSocialLink[]
-}
-
-enum PlayerStatus {
-  ONLINE
-  OFFLINE
-  INGAME
-  AWAY
-}
-
-enum PlayerTrend {
-  UP
-  DOWN
-  STABLE
 }
 
 model PlayerAchievement {
@@ -208,7 +184,7 @@ model News {
   excerpt      String
   content      String
   image        String?
-  category     String // "Турниры", "Оборудование", "Партнёры", "Анонсы"
+  category     String    // "Турниры", "Оборудование", "Партнёры", "Анонсы"
   published    Boolean   @default(false)
   featured     Boolean   @default(false)
   views        Int       @default(0)
