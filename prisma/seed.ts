@@ -133,7 +133,10 @@ async function main() {
         data: {
             slug: 'cs2-winter-cup',
             name: 'CS2 Winter Cup',
-            game: 'CS2',
+            game: {create: {
+                id: 1,
+                name: "CS2"
+            }},
             description: 'Зимний турнир для лучших игроков',
             date: new Date('2026-02-10'),
             time: '18:00',

@@ -47,9 +47,7 @@ export function ZonesSection() {
             <div className="max-w-7xl mx-auto px-6">
                 {/* Section Header */}
                 <div
-                    className={`text-center mb-16 transition-all duration-700 ${
-                        isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-10"
-                    }`}
+                    className={`text-center mb-16 transition-all duration-700 ${isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-10"}`}
                 >
                     <span
                         className="text-primary text-sm font-semibold tracking-widest uppercase mb-4 block">Оборудование</span>
@@ -118,14 +116,8 @@ export function ZonesSection() {
                                         </div>
 
                                         {/* Hover Glow */}
-                                        <div
-                                            className={cn(
-                                                "absolute inset-0 pointer-events-none transition-opacity duration-500",
-                                                isHovered === zone.slug ? "opacity-100" : "opacity-0",
-                                            )}
-                                        >
-                                            <div
-                                                className="absolute inset-0 bg-linear-to-t from-primary/5 to-transparent"/>
+                                        <div className={cn("absolute inset-0 pointer-events-none transition-opacity duration-500", isHovered === zone.slug ? "opacity-100" : "opacity-0")}>
+                                            <div className="absolute inset-0 bg-linear-to-t from-primary/5 to-transparent" />
                                         </div>
                                     </Link>
                                 ))}

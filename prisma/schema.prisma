@@ -21,7 +21,7 @@ enum DeviceCategory {
 }
 
 model Zone {
-  id          String   @id @default(cuid())
+  id          Int   @id @default(autoincrement())
   slug        String   @unique
   name        String
   description String
@@ -37,39 +37,38 @@ model Zone {
 }
 
 model ZoneComponent {
-  id       String @id @default(cuid())
+  id       Int            @id @default(autoincrement())
   category ComponentCategory // "gpu", "cpu", "monitor"
-  order    Int    @default(0)
+  order    Int               @default(0)
   model    String
   specs    String
-  zoneId   String
-  zone     Zone   @relation(fields: [zoneId], references: [id], onDelete: Cascade)
+  zoneId   Int
+  zone     Zone              @relation(fields: [zoneId], references: [id], onDelete: Cascade)
 }
 
 model ZoneDevice {
-  id       String @id @default(cuid())
+  id       Int         @id @default(autoincrement())
   category DeviceCategory // "keyboard", "mouse", "headset"
-  order    Int    @default(0)
+  order    Int            @default(0)
   model    String
   specs    String
-  zoneId   String
-  zone     Zone   @relation(fields: [zoneId], references: [id], onDelete: Cascade)
+  zoneId   Int
+  zone     Zone           @relation(fields: [zoneId], references: [id], onDelete: Cascade)
 }
 
 model ZonePhoto {
-  id     String @id @default(cuid())
+  id     Int @id @default(autoincrement())
   url    String
   alt    String
   order  Int    @default(0)
-  zoneId String
+  zoneId Int
   zone   Zone   @relation(fields: [zoneId], references: [id], onDelete: Cascade)
 }
 
 model Tournament {
-  id                  String           @id @default(cuid())
+  id                  String           @id @default(uuid(4))
   slug                String           @unique
   name                String
-  game                String
   description         String?
   date                DateTime
   time                String
@@ -84,8 +83,17 @@ model Tournament {
   updatedAt           DateTime         @updatedAt
 
   // Relations
-  participants TournamentPlayer[]
-  matches      Match[]
+  participants     TournamentPlayer[]
+  matches          Match[]
+
+  gameId           Int
+  game             Game @relation(fields: [gameId], references: [id])
+}
+
+model Game {
+  id          Int       @id @default(autoincrement())
+  name        String
+  tournaments Tournament[]
 }
 
 enum TournamentStatus {
@@ -96,15 +104,15 @@ enum TournamentStatus {
 }
 
 model Player {
-  id          String       @id @default(cuid())
-  username    String       @unique
-  nickname    String
-  email       String?      @unique
-  avatar      String?
-  rating      Int          @default(1000)
-  rank        Int?
-  createdAt   DateTime     @default(now())
-  updatedAt   DateTime     @updatedAt
+  id        String   @id @default(uuid(4))
+  username  String   @unique
+  nickname  String
+  email     String?  @unique
+  avatar    String?
+  rating    Int      @default(1000)
+  rank      Int?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   // Relations
   tournaments      TournamentPlayer[]
@@ -116,7 +124,7 @@ model Player {
 }
 
 model PlayerAchievement {
-  id          String            @id @default(cuid())
+  id          String            @id @default(uuid(4))
   name        String
   description String
   icon        String?
@@ -142,7 +150,7 @@ model PlayerSocialLink {
 }
 
 model TournamentPlayer {
-  id           String   @id @default(cuid())
+  id           String   @id @default(uuid(4))
   placement    Int?
   prizeWon     String?
   registeredAt DateTime @default(now())
@@ -157,7 +165,7 @@ model TournamentPlayer {
 }
 
 model Match {
-  id       String   @id @default(cuid())
+  id       String   @id @default(uuid(4))
   game     String
   map      String?
   score    String? // e.g., "16-12" or "2-1"
@@ -178,13 +186,13 @@ model Match {
 }
 
 model News {
-  id           String    @id @default(cuid())
+  id           String    @id @default(uuid(4))
   slug         String    @unique
   title        String
   excerpt      String
   content      String
   image        String?
-  category     String    // "Турниры", "Оборудование", "Партнёры", "Анонсы"
+  category     String
   published    Boolean   @default(false)
   featured     Boolean   @default(false)
   views        Int       @default(0)
@@ -199,7 +207,7 @@ model News {
 }
 
 model NewsTag {
-  id     String @id @default(cuid())
+  id     Int @id @default(autoincrement())
   name   String
   newsId String
   news   News   @relation(fields: [newsId], references: [id], onDelete: Cascade)

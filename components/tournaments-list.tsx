@@ -1,6 +1,6 @@
 "use client"
 
-import {useState} from "react"
+import {useEffect, useState} from "react"
 import Link from "next/link"
 import Image from "next/image"
 import {Calendar, Users, Trophy, Clock, Play, ChevronRight, Filter} from "lucide-react"
@@ -8,6 +8,8 @@ import {cn} from "@/lib/utils"
 import useSWR from "swr";
 import {fetcher} from "@/constants/fetcher";
 import {notFound} from "next/navigation";
+import {type TournamentStatus} from "@/prisma/generated/enums";
+import {Paginator} from "@/components/paginator";
 
 interface Tournament {
     id: string
@@ -25,19 +27,29 @@ interface Tournament {
     streamUrl?: string
 }
 
-const statusConfig: Record<string, { label: string; color: string }> = {
+const statusConfig: Record<TournamentStatus, { label: string; color: string }> = {
     REGISTRATION: {label: "Регистрация", color: "bg-emerald-500/20 text-emerald-400 border-emerald-500/30"},
     ONGOING: {label: "Идёт", color: "bg-amber-500/20 text-amber-400 border-amber-500/30"},
     COMPLETED: {label: "Завершён", color: "bg-zinc-500/20 text-zinc-400 border-zinc-500/30"},
     CANCELLED: {label: "Отменён", color: "bg-red-500/20 text-red-400 border-red-500/30"},
 }
 
-const gameFilters = ["Все", "CS2", "Dota 2", "Valorant", "FC 24"]
-
 export function TournamentsList() {
     const [filter, setFilter] = useState("Все")
     const [statusFilter, setStatusFilter] = useState("Все")
-    const {data: tournaments, isLoading} = useSWR<Tournament[]>(`/api/tournaments/`, fetcher)
+
+    const [page, setPage] = useState(1)
+    const limit = 6
+
+    const { data, isLoading } = useSWR<PaginatedResponse<Tournament>>(`/api/tournaments?page=${page}&limit=${limit}`, fetcher, { keepPreviousData: true })
+    const gameFilters = useSWR<{ id: string, name: string }[]>(`/api/games`, fetcher).data
+
+    const tournaments = data?.data ?? []
+    const meta = data?.meta
+
+    useEffect(() => {
+        setPage(1)
+    }, [filter, statusFilter])
 
     if (!tournaments && !isLoading) {
         return notFound()
@@ -56,8 +68,8 @@ export function TournamentsList() {
     }
 
     const filteredTournaments = tournaments.filter((t) => {
-        const gameMatch = filter === "Все" || t.game === filter
-        const statusMatch = statusFilter === "Все" || t.status === statusFilter
+        const gameMatch = filter === "Все" || t.game.toLowerCase() === filter.toLowerCase()
+        const statusMatch = statusFilter === "Все" || t.status.toLowerCase() === statusFilter.toLowerCase()
         return gameMatch && statusMatch
     })
 
@@ -77,18 +89,18 @@ export function TournamentsList() {
                     <Filter className="w-4 h-4 text-muted-foreground"/>
                     <span className="text-sm text-muted-foreground">Игра:</span>
                     <div className="flex gap-2">
-                        {gameFilters.map((game) => (
+                        {gameFilters && gameFilters.map((game) => (
                             <button
-                                key={game}
-                                onClick={() => setFilter(game)}
+                                key={game.id}
+                                onClick={() => setFilter(game.name)}
                                 className={cn(
                                     "px-3 py-1.5 text-sm font-medium rounded-lg border transition-all duration-300",
-                                    filter === game
+                                    filter === game.name
                                         ? "bg-primary text-primary-foreground border-primary"
                                         : "bg-card text-muted-foreground border-border hover:border-primary/50",
                                 )}
                             >
-                                {game}
+                                {game.name}
                             </button>
                         ))}
                     </div>
@@ -108,7 +120,7 @@ export function TournamentsList() {
                                         : "bg-card text-muted-foreground border-border hover:border-primary/50",
                                 )}
                             >
-                                {status === "Все" ? "Все" : statusConfig[status]?.label}
+                                {status === "Все" ? "Все" : statusConfig[status as TournamentStatus]?.label}
                             </button>
                         ))}
                     </div>
@@ -147,10 +159,10 @@ export function TournamentsList() {
                                         <span
                                             className={cn(
                                                 "px-3 py-1 text-xs font-semibold rounded-full border",
-                                                statusConfig[tournament.status]?.color,
+                                                statusConfig[tournament.status as TournamentStatus]?.color,
                                             )}
                                         >
-                                            {statusConfig[tournament.status]?.label}
+                                            {statusConfig[tournament.status as TournamentStatus]?.label}
                                         </span>
                                     </div>
                                 </div>
@@ -213,6 +225,10 @@ export function TournamentsList() {
                     ))
                 )}
             </div>
+
+            {meta && meta.totalPages > 1 && (
+                <Paginator page={page} meta={meta} setPage={setPage} />
+            )}
         </div>
     )
 }

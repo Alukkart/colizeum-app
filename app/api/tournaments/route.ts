@@ -1,13 +1,37 @@
-import {NextResponse} from "next/server"
-import prisma from "@/lib/prisma";
+import { NextResponse } from "next/server"
+import prisma from "@/lib/prisma"
 
-export async function GET() {
+export async function GET(req: Request) {
     try {
-        const tournaments = await prisma.tournament.findMany({})
+        const { searchParams } = new URL(req.url)
 
-        return NextResponse.json(tournaments)
+        const page = Number(searchParams.get("page") ?? 1)
+        const limit = Number(searchParams.get("limit") ?? 6)
+
+        const skip = (page - 1) * limit
+
+        const [tournaments, total] = await Promise.all([
+            prisma.tournament.findMany({
+                skip,
+                take: limit,
+                orderBy: {
+                    date: "asc",
+                },
+            }),
+            prisma.tournament.count(),
+        ])
+
+        return NextResponse.json({
+            data: tournaments,
+            meta: {
+                page,
+                limit,
+                total,
+                totalPages: Math.ceil(total / limit),
+            },
+        })
     } catch (error) {
         console.error("Error fetching tournaments:", error)
-        return NextResponse.json([], {status: 500})
+        return NextResponse.json({ data: [], meta: null }, { status: 500 })
     }
 }
