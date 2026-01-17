@@ -50,7 +50,7 @@ export function NewsList({news, tags, activeTag}: NewsListProps) {
             {/* Featured News */}
             {featuredNews && (
                 <Link
-                    href={`/news/${featuredNews.slug}`}
+                    href={`/app/(main)/news/${featuredNews.slug}`}
                     className="group relative block mb-10 rounded-3xl overflow-hidden border border-border hover:border-primary/50 transition-all duration-500"
                 >
                     <div className="relative h-80 md:h-120">
@@ -112,7 +112,7 @@ export function NewsList({news, tags, activeTag}: NewsListProps) {
                     news.map((item, index) => (
                         <Link
                             key={item.id}
-                            href={`/news/${item.slug}`}
+                            href={`/app/(main)/news/${item.slug}`}
                             className="group bg-card border border-border rounded-2xl overflow-hidden hover:border-primary/50 transition-all duration-500"
                             style={{animationDelay: `${index * 100}ms`}}
                         >

@@ -101,7 +101,7 @@ export function TournamentsList({tournaments, gameFilters}: Props) {
                     filteredTournaments.map((tournament, index) => (
                         <Link
                             key={tournament.id}
-                            href={`/tournaments/${tournament.slug}`}
+                            href={`/app/(main)/tournaments/${tournament.slug}`}
                             className="group relative bg-card border border-border rounded-2xl overflow-hidden hover:border-primary/50 transition-all duration-500"
                             style={{animationDelay: `${index * 100}ms`}}
                         >

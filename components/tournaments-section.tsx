@@ -104,7 +104,7 @@ export function TournamentsSection({ tournaments }: Props) {
                         {tournaments.map((tournament, index) => (
                             <Link
                                 key={tournament.id}
-                                href={`/tournaments/${tournament.slug}`}
+                                href={`/app/(main)/tournaments/${tournament.slug}`}
                                 className="group grid grid-cols-1 lg:grid-cols-12 gap-4 px-6 py-5 hover:bg-secondary/30 transition-all duration-300 cursor-pointer"
                                 style={{transitionDelay: `${index * 50}ms`}}
                             >

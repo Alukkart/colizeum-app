@@ -103,7 +103,7 @@ export function NewsSection({news}: Props) {
 
                                 {/* Read More */}
                                 <Link
-                                    href={`/news/${item.slug}`}
+                                    href={`/app/(main)/news/${item.slug}`}
                                     className="inline-flex items-center gap-2 text-primary text-sm font-semibold group/link"
                                 >
                                     Читать далее

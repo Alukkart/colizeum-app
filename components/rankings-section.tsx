@@ -96,7 +96,7 @@ export function RankingsSection({players}: Props) {
                                         {/* Player */}
                                         <TableCell>
                                             <Link
-                                                href={`/profile/${player.username}`}
+                                                href={`/app/(main)/profile/${player.username}`}
                                                 className="flex items-center gap-4 group"
                                             >
                                                 <img

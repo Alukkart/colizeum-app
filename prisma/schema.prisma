@@ -1,3 +1,6 @@
+generator nextAdmin {
+    provider              = "next-admin-generator-prisma"
+  }
 generator client {
   provider   = "prisma-client"
   output     = "./generated"
@@ -210,4 +213,12 @@ model NewsTag {
   name   String
   newsId String
   news   News   @relation(fields: [newsId], references: [id], onDelete: Cascade)
+}
+
+model Admins {
+  id        String   @id @default(uuid())
+  username  String   @unique
+  password  String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }

@@ -282,7 +282,7 @@ export function TournamentDetail({slug}: { slug: string }) {
                             tournament.participants.map((participant, idx) => (
                                 <Link
                                     key={participant.id}
-                                    href={`/profile/${participant.player.username}`}
+                                    href={`/app/(main)/profile/${participant.player.username}`}
                                     className="grid grid-cols-12 gap-4 p-4 items-center hover:bg-muted/30 transition-colors border-b border-border last:border-0"
                                 >
                                     <div className="col-span-1 text-muted-foreground">{idx + 1}</div>
@@ -360,7 +360,7 @@ export function TournamentDetail({slug}: { slug: string }) {
 
                                     <div className="flex items-center justify-between">
                                         {/* Player 1 */}
-                                        <Link href={`/profile/${match.player1Username}`}
+                                        <Link href={`/app/(main)/profile/${match.player1Username}`}
                                               className="flex items-center gap-3 group">
                                             <div
                                                 className="relative w-12 h-12 rounded-full overflow-hidden border-2 border-border group-hover:border-primary transition-colors">
@@ -392,7 +392,7 @@ export function TournamentDetail({slug}: { slug: string }) {
 
                                         {/* Player 2 */}
                                         <Link
-                                            href={`/profile/${match.player2Username}`}
+                                            href={`/app/(main)/profile/${match.player2Username}`}
                                             className="flex items-center gap-3 group flex-row-reverse"
                                         >
                                             <div
