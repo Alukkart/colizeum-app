@@ -1,203 +1,232 @@
 import { PrismaClient } from '@/prisma/generated/client'
-import {PrismaPg} from "@prisma/adapter-pg";
-import {databaseUrl} from "@/prisma.config";
+import { PrismaPg } from '@prisma/adapter-pg'
+import { databaseUrl } from '@/prisma.config'
+
 const adapter = new PrismaPg({
     connectionString: databaseUrl,
 })
 
-const prisma = new PrismaClient({adapter})
+const prisma = new PrismaClient({ adapter })
 
 async function main() {
-    console.log('🧹 Clearing database before seeding...')
+    console.log('🧹 Clearing database...')
     await prisma.match.deleteMany({})
     await prisma.news.deleteMany({})
     await prisma.player.deleteMany({})
     await prisma.zone.deleteMany({})
     await prisma.tournament.deleteMany({})
+    await prisma.game.deleteMany({})
+    console.log('✅ Database cleared')
 
-    console.log('🧹 Database cleared')
-    console.log('🌱 Start seeding...')
     /* -------------------- ZONES -------------------- */
-    await prisma.zone.create({
-        data: {
-            slug: 'bootcamp',
-            name: 'Bootcamp',
-            description: 'Профессиональная игровая зона для турниров',
-            image: '/bootcamp.jpg',
-            price: '1500₽ / час',
-            components: {
-                create: [
-                    {
-                        category: 'gpu',
-                        model: 'RTX 4070',
-                        specs: '12GB GDDR6X',
-                        order: 1
-                    },
-                    {
-                        category: 'cpu',
-                        model: 'i7 13700K',
-                        specs: '16 cores',
-                        order: 2
-                    },
-                    {
-                        category: 'monitor',
-                        model: 'ROG Swift',
-                        specs: '240Hz, 27"',
-                        order: 3
-                    },
-                ],
+    await prisma.zone.createMany({
+        data: [
+            {
+                slug: 'bootcamp',
+                name: 'Bootcamp',
+                description: 'Профессиональная зона для командных тренировок',
+                image: '/zones/bootcamp.jpg',
+                price: '1500₽ / час',
             },
-
-            devices: {
-                create: [
-                    {
-                        category: 'keyboard',
-                        model: 'Apex Pro',
-                        specs: 'Mechanical',
-                        order: 2
-                    },
-                    {
-                        category: 'mouse',
-                        model: 'G Pro X',
-                        specs: 'Wireless',
-                        order: 1
-                    },
-                    {
-                        category: 'headset',
-                        model: 'Cloud II',
-                        specs: '7.1 Surround',
-                        order: 3
-                    },
-                ],
+            {
+                slug: 'arena',
+                name: 'Arena',
+                description: 'Основная игровая зона для пабликов',
+                image: '/zones/arena.jpg',
+                price: '300₽ / час',
             },
-
-            photos: {
-                create: [
-                    {
-                        url: '/bootcamp.jpg',
-                        alt: 'Pro Zone',
-                        order: 1,
-                    }
-                ],
+            {
+                slug: 'vip',
+                name: 'VIP Zone',
+                description: 'Премиум зона с топовым железом',
+                image: '/zones/vip.jpg',
+                price: '800₽ / час',
             },
-        },
+        ],
     })
+
+    const bootcamp = await prisma.zone.findUnique({ where: { slug: 'bootcamp' } })
+    const arena = await prisma.zone.findUnique({ where: { slug: 'arena' } })
+    const vip = await prisma.zone.findUnique({ where: { slug: 'vip' } })
+
+    for (const zone of [bootcamp!, arena!, vip!]) {
+        await prisma.zoneComponent.createMany({
+            data: [
+                { zoneId: zone.id, category: 'gpu', model: 'RTX 4070', specs: '12GB', order: 1 },
+                { zoneId: zone.id, category: 'cpu', model: 'i7-13700K', specs: '16 cores', order: 2 },
+                { zoneId: zone.id, category: 'monitor', model: '240Hz', specs: '27"', order: 3 },
+            ],
+        })
+
+        await prisma.zoneDevice.createMany({
+            data: [
+                { zoneId: zone.id, category: 'mouse', model: 'Logitech G Pro', specs: 'Wireless', order: 1 },
+                { zoneId: zone.id, category: 'keyboard', model: 'SteelSeries Apex Pro', specs: 'Mechanical', order: 2 },
+                { zoneId: zone.id, category: 'headset', model: 'HyperX Cloud II', specs: '7.1', order: 3 },
+            ],
+        })
+
+        await prisma.zonePhoto.create({
+            data: {
+                zoneId: zone.id,
+                url: zone.image,
+                alt: zone.name,
+                order: 1,
+            },
+        })
+    }
+
+    /* -------------------- GAMES -------------------- */
+    const [cs2, dota] = await Promise.all([
+        prisma.game.create({ data: { name: 'CS2' } }),
+        prisma.game.create({ data: { name: 'Dota 2' } }),
+        prisma.game.create({ data: { name: 'Valorant' } }),
+    ])
 
     /* -------------------- PLAYERS -------------------- */
-    const player1 = await prisma.player.create({
-        data: {
-            username: 'player_one',
-            nickname: 'OneTap',
-            email: 'one@mail.com',
-            rating: 1450,
-            achievements: {
-                create: [
-                    {
-                        name: 'First Blood',
-                        description: 'Первая победа',
-                        rarity: 'COMMON',
-                    },
-                    {
-                        name: 'Sharpshooter',
-                        description: '100 хедшотов',
-                        rarity: 'RARE',
-                    },
-                ],
+    const players = await Promise.all([
+        prisma.player.create({
+            data: {
+                username: 'onetap',
+                nickname: 'OneTap',
+                email: 'one@mail.com',
+                rating: 1450,
+                achievements: {
+                    create: [
+                        { name: 'First Blood', description: 'Первая победа' },
+                        { name: 'Sharpshooter', description: '100 хедшотов', rarity: 'RARE' },
+                    ],
+                },
+                socialLinks: {
+                    create: [
+                        { platform: 'steam', url: 'https://steamcommunity.com/id/onetap' },
+                    ],
+                },
             },
+        }),
+        prisma.player.create({
+            data: { username: 'clutch', nickname: 'ClutchKing', rating: 1380 },
+        }),
+        prisma.player.create({
+            data: { username: 'sniper', nickname: 'DeadEye', rating: 1520 },
+        }),
+        prisma.player.create({
+            data: { username: 'support', nickname: 'Anchor', rating: 1300 },
+        }),
+        prisma.player.create({
+            data: { username: 'igl', nickname: 'Brain', rating: 1600 },
+        }),
+        prisma.player.create({
+            data: { username: 'rookie', nickname: 'Newbie', rating: 950 },
+        }),
+    ])
 
-            socialLinks: {
-                create: [
-                    {
-                        platform: 'steam',
-                        url: 'https://steamcommunity.com/id/onetap',
-                    },
-                    {
-                        platform: 'discord',
-                        url: 'https://discord.gg/onetap',
-                    },
-                ],
-            },
-        },
-    })
-
-    const player2 = await prisma.player.create({
-        data: {
-            username: 'player_two',
-            nickname: 'ClutchKing',
-            rating: 1380,
-        },
-    })
-
-    /* -------------------- TOURNAMENT -------------------- */
-    const tournament = await prisma.tournament.create({
+    /* -------------------- TOURNAMENTS -------------------- */
+    const cs2Tournament = await prisma.tournament.create({
         data: {
             slug: 'cs2-winter-cup',
             name: 'CS2 Winter Cup',
-            game: {create: {
-                id: 1,
-                name: "CS2"
-            }},
             description: 'Зимний турнир для лучших игроков',
             date: new Date('2026-02-10'),
             time: '18:00',
             prize: '100 000 ₽',
             maxParticipants: 16,
-            image: '/cs2-esports-tournament-dark.jpg',
-
+            image: '/tournaments/cs2.jpg',
+            gameId: cs2.id,
+            status: 'REGISTRATION',
             participants: {
-                create: [
-                    { playerId: player1.id },
-                    { playerId: player2.id },
-                ],
+                create: players.slice(0, 4).map((p) => ({ playerId: p.id })),
             },
         },
     })
 
-    /* -------------------- MATCH -------------------- */
-    await prisma.match.create({
+    const dotaTournament = await prisma.tournament.create({
         data: {
-            game: 'CS2',
-            map: 'Mirage',
-            score: '16-12',
-            duration: 45,
-            tournamentId: tournament.id,
-            player1Id: player1.id,
-            player2Id: player2.id,
-            winnerId: player1.id,
+            slug: 'dota-spring-open',
+            name: 'Dota 2 Spring Open',
+            date: new Date('2026-03-15'),
+            time: '17:00',
+            prize: '200 000 ₽',
+            maxParticipants: 32,
+            status: 'ONGOING',
+            gameId: dota.id,
+            participants: {
+                create: players.map((p) => ({ playerId: p.id })),
+            },
         },
+    })
+
+    /* -------------------- MATCHES -------------------- */
+    await prisma.match.createMany({
+        data: [
+            {
+                game: 'CS2',
+                map: 'Mirage',
+                score: '16-12',
+                duration: 42,
+                tournamentId: cs2Tournament.id,
+                player1Id: players[0].id,
+                player2Id: players[1].id,
+                winnerId: players[0].id,
+            },
+            {
+                game: 'Dota 2',
+                score: '2-1',
+                duration: 65,
+                tournamentId: dotaTournament.id,
+                player1Id: players[2].id,
+                player2Id: players[3].id,
+                winnerId: players[2].id,
+            },
+            {
+                game: 'CS2',
+                map: 'Inferno',
+                score: '16-14',
+                duration: 50,
+                player1Id: players[4].id,
+                player2Id: players[5].id,
+                winnerId: players[4].id,
+            },
+        ],
     })
 
     /* -------------------- NEWS -------------------- */
-    await prisma.news.create({
-        data: {
-            slug: 'winter-cup-announcement',
-            title: 'Анонс CS2 Winter Cup',
-            excerpt: 'Открыта регистрация на зимний турнир',
-            content: 'Приглашаем всех игроков принять участие...',
-            category: 'Турниры',
-            published: true,
-            featured: true,
-            publishedAt: new Date(),
-            authorName: 'Admin',
-
-            tags: {
-                create: [
-                    { name: 'CS2' },
-                    { name: 'Турнир' },
-                    { name: 'Анонс' },
-                ],
+    await prisma.news.createMany({
+        data: [
+            {
+                slug: 'cs2-winter-cup-announcement',
+                title: 'Анонс CS2 Winter Cup',
+                excerpt: 'Открыта регистрация на зимний турнир',
+                content: 'Призовой фонд 100 000 ₽...',
+                category: 'Турниры',
+                published: true,
+                featured: true,
+                publishedAt: new Date(),
+                authorName: 'Admin',
             },
-        },
+            {
+                slug: 'vip-zone-open',
+                title: 'Открытие VIP зоны',
+                excerpt: 'Новая премиум зона уже доступна',
+                content: 'RTX 4090, OLED мониторы...',
+                category: 'Клуб',
+                published: true,
+                publishedAt: new Date(),
+            },
+            {
+                slug: 'valorant-coming-soon',
+                title: 'Valorant турниры скоро',
+                excerpt: 'Готовим новый формат',
+                content: 'Следите за новостями',
+                category: 'Анонсы',
+                published: false,
+            },
+        ],
     })
 
-    console.log('✅ Seeding finished')
+    console.log('✅ Seeding finished successfully')
 }
 
 main()
-    .catch((e) => {
-        console.error(e)
-        process.exit(1)
-    })
-    .finally(async () => {
-        await prisma.$disconnect()
-    })
+    .catch(console.error)
+    .finally(() => prisma.$disconnect())

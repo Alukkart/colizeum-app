@@ -17,12 +17,15 @@ export async function GET(req: Request) {
                 orderBy: {
                     date: "asc",
                 },
+                include: {
+                    game: true,
+                },
             }),
             prisma.tournament.count(),
         ])
 
         return NextResponse.json({
-            data: tournaments,
+            tournaments,
             meta: {
                 page,
                 limit,

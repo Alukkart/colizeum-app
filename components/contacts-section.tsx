@@ -1,7 +1,7 @@
 "use client"
 
 import { useRef, useState, useEffect } from "react"
-import { MapPin, Phone, Mail, Clock, Send, Instagram, Youtube } from "lucide-react"
+import { MapPin, Phone, Mail, Clock, Send } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 
@@ -33,8 +33,6 @@ const contactInfo = [
 ]
 
 const socials = [
-  { icon: Instagram, label: "Instagram", href: "#" },
-  { icon: Youtube, label: "YouTube", href: "#" },
   {
     icon: () => (
       <svg className="w-5 h-5" viewBox="0 0 24 24" fill="currentColor">

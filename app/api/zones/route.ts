@@ -10,7 +10,7 @@ export async function GET() {
         })
 
         console.log("Fetched zones:", zones)
-        return NextResponse.json(zones)
+        return NextResponse.json({zones})
     } catch (error) {
         console.error("Error fetching zones:", error)
         return NextResponse.json([], {status: 500})

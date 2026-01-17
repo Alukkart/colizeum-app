@@ -134,21 +134,6 @@ model PlayerAchievement {
   player      Player            @relation(fields: [playerId], references: [id], onDelete: Cascade)
 }
 
-enum AchievementRarity {
-  COMMON
-  RARE
-  EPIC
-  LEGENDARY
-}
-
-model PlayerSocialLink {
-  id       String @id @default(cuid())
-  platform String // steam, discord, twitch, youtube
-  url      String
-  playerId String
-  player   Player @relation(fields: [playerId], references: [id], onDelete: Cascade)
-}
-
 model TournamentPlayer {
   id           String   @id @default(uuid(4))
   placement    Int?
@@ -185,6 +170,21 @@ model Match {
   winner   Player? @relation("WinnerMatches", fields: [winnerId], references: [id], onDelete: SetNull)
 }
 
+enum AchievementRarity {
+  COMMON
+  RARE
+  EPIC
+  LEGENDARY
+}
+
+model PlayerSocialLink {
+  id       String @id @default(cuid())
+  platform String // steam, discord, twitch, youtube
+  url      String
+  playerId String
+  player   Player @relation(fields: [playerId], references: [id], onDelete: Cascade)
+}
+
 model News {
   id           String    @id @default(uuid(4))
   slug         String    @unique
@@ -195,7 +195,6 @@ model News {
   category     String
   published    Boolean   @default(false)
   featured     Boolean   @default(false)
-  views        Int       @default(0)
   authorName   String?
   authorAvatar String?
   publishedAt  DateTime?

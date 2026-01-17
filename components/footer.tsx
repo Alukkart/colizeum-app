@@ -1,5 +1,4 @@
 import Link from "next/link"
-import { Instagram, Youtube } from "lucide-react"
 
 const footerLinks = {
   navigation: [
@@ -17,8 +16,6 @@ const footerLinks = {
 }
 
 const socials = [
-  { icon: Instagram, href: "#" },
-  { icon: Youtube, href: "#" },
   {
     icon: () => (
       <svg className="w-5 h-5" viewBox="0 0 24 24" fill="currentColor">

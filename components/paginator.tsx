@@ -10,13 +10,18 @@ import {
 
 interface Props{
     page: number
-    setPage: (page: number) => void
-    meta: {
-        totalPages: number
-    }
+    totalPages: number
+    filter?: string
 }
 
-export const Paginator: React.FC<Props> = ({ page, meta, setPage }) => {
+export const Paginator: React.FC<Props> = ({ page, totalPages, filter }) => {
+    const buildHref = (newPage: number) => {
+        const params = new URLSearchParams()
+        params.set("page", String(newPage))
+        if (filter) params.set("tag", filter)
+        return `?${params.toString()}`
+    }
+
     return (
         <Pagination className="mt-12">
             <PaginationContent>
@@ -24,22 +29,22 @@ export const Paginator: React.FC<Props> = ({ page, meta, setPage }) => {
                 {/* Previous */}
                 <PaginationItem>
                     <PaginationPrevious
-                        onClick={() => page > 1 && setPage(page - 1)}
+                        href={buildHref(page - 1)}
                         className={page === 1 ? "pointer-events-none opacity-50" : ""}
                     />
                 </PaginationItem>
 
                 {/* Pages */}
-                {Array.from({ length: meta.totalPages }, (_, i) => i + 1)
+                {Array.from({ length: totalPages }, (_, i) => i + 1)
                     .slice(
                         Math.max(0, page - 2),
-                        Math.min(meta.totalPages, page + 1)
+                        Math.min(totalPages, page + 1)
                     )
                     .map((p) => (
                         <PaginationItem key={p}>
                             <PaginationLink
                                 isActive={p === page}
-                                onClick={() => setPage(p)}
+                                href={buildHref(p)}
                             >
                                 {p}
                             </PaginationLink>
@@ -47,19 +52,20 @@ export const Paginator: React.FC<Props> = ({ page, meta, setPage }) => {
                     ))}
 
                 {/* Ellipsis */}
-                {page + 1 < meta.totalPages && (
+                {page + 1 < totalPages && (
                     <PaginationItem>
                         <PaginationEllipsis />
                     </PaginationItem>
                 )}
 
                 {/* Next */}
-                <PaginationItem>
-                    <PaginationNext
-                        onClick={() => page < meta.totalPages && setPage(page + 1)}
-                        className={page === meta.totalPages ? "pointer-events-none opacity-50" : ""}
-                    />
-                </PaginationItem>
+                {page < totalPages && (
+                    <PaginationItem>
+                        <PaginationNext
+                            href={buildHref(page + 1)}
+                        />
+                    </PaginationItem>
+                )}
 
             </PaginationContent>
         </Pagination>

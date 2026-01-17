@@ -1,31 +1,13 @@
 "use client"
 
-import {useEffect, useState} from "react"
+import {useState} from "react"
 import Link from "next/link"
 import Image from "next/image"
 import {Calendar, Users, Trophy, Clock, Play, ChevronRight, Filter} from "lucide-react"
 import {cn} from "@/lib/utils"
-import useSWR from "swr";
-import {fetcher} from "@/constants/fetcher";
-import {notFound} from "next/navigation";
 import {type TournamentStatus} from "@/prisma/generated/enums";
-import {Paginator} from "@/components/paginator";
-
-interface Tournament {
-    id: string
-    slug: string
-    name: string
-    game: string
-    description?: string
-    date: string
-    time: string
-    status: string
-    prize: string
-    maxParticipants: number
-    currentParticipants: number
-    image?: string
-    streamUrl?: string
-}
+import {Game} from "@/prisma/generated/client";
+import {TournamentWithGame} from "@/service/tournaments";
 
 const statusConfig: Record<TournamentStatus, { label: string; color: string }> = {
     REGISTRATION: {label: "Регистрация", color: "bg-emerald-500/20 text-emerald-400 border-emerald-500/30"},
@@ -34,41 +16,22 @@ const statusConfig: Record<TournamentStatus, { label: string; color: string }> =
     CANCELLED: {label: "Отменён", color: "bg-red-500/20 text-red-400 border-red-500/30"},
 }
 
-export function TournamentsList() {
+type Props = {
+    tournaments: TournamentWithGame[]
+    gameFilters: Game[]
+}
+
+export function TournamentsList({tournaments, gameFilters}: Props) {
+    console.log(tournaments)
     const [filter, setFilter] = useState("Все")
     const [statusFilter, setStatusFilter] = useState("Все")
-
-    const [page, setPage] = useState(1)
-    const limit = 6
-
-    const { data, isLoading } = useSWR<PaginatedResponse<Tournament>>(`/api/tournaments?page=${page}&limit=${limit}`, fetcher, { keepPreviousData: true })
-    const gameFilters = useSWR<{ id: string, name: string }[]>(`/api/games`, fetcher).data
-
-    const tournaments = data?.data ?? []
-    const meta = data?.meta
-
-    useEffect(() => {
-        setPage(1)
-    }, [filter, statusFilter])
-
-    if (!tournaments && !isLoading) {
-        return notFound()
-    }
-
-    if (isLoading) {
-        return (
-            <div className="max-w-4xl mx-auto px-6 py-12">
-                <p className="text-center text-muted-foreground">Загрузка турниров...</p>
-            </div>
-        )
-    }
 
     if(!tournaments){
         return null
     }
 
     const filteredTournaments = tournaments.filter((t) => {
-        const gameMatch = filter === "Все" || t.game.toLowerCase() === filter.toLowerCase()
+        const gameMatch = filter === "Все" || t.game.name.toLowerCase() === filter.toLowerCase()
         const statusMatch = statusFilter === "Все" || t.status.toLowerCase() === statusFilter.toLowerCase()
         return gameMatch && statusMatch
     })
@@ -172,7 +135,7 @@ export function TournamentsList() {
                                     <div>
                                         <div className="flex items-center gap-3 mb-3">
                                             <span className="px-2 py-1 bg-primary/10 text-primary text-xs font-semibold rounded">
-                                                {tournament.game}
+                                                {tournament.game.name}
                                             </span>
                                             {tournament.streamUrl && (
                                                 <span className="flex items-center gap-1 text-red-400 text-xs">
@@ -225,10 +188,6 @@ export function TournamentsList() {
                     ))
                 )}
             </div>
-
-            {meta && meta.totalPages > 1 && (
-                <Paginator page={page} meta={meta} setPage={setPage} />
-            )}
         </div>
     )
 }

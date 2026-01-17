@@ -2,25 +2,10 @@
 
 import {useRef, useState, useEffect} from "react"
 import {Calendar, Users, Trophy, ChevronRight} from "lucide-react"
-import {cn} from "@/lib/utils"
+import {cn, formatDate} from "@/lib/utils"
 import Link from "next/link"
-import useSWR from "swr"
-
-type TournamentStatus = "REGISTRATION" | "ONGOING" | "COMPLETED" | "CANCELLED"
-
-interface Tournament {
-    id: string
-    slug: string
-    name: string
-    game: string
-    date: string
-    time: string
-    status: TournamentStatus
-    prize: string
-    maxParticipants: number
-    currentParticipants: number
-    image: string | null
-}
+import {TournamentWithGame} from "@/service/tournaments";
+import {TournamentStatus} from "@/prisma/generated/enums";
 
 const statusConfig = {
     REGISTRATION: {label: "Регистрация", color: "bg-primary text-primary-foreground"},
@@ -29,14 +14,14 @@ const statusConfig = {
     CANCELLED: {label: "Отменён", color: "bg-destructive text-destructive-foreground"},
 }
 
-const fetcher = (url: string) => fetch(url).then((res) => res.json())
+interface Props {
+    tournaments: TournamentWithGame[]
+}
 
-export function TournamentsSection() {
+export function TournamentsSection({ tournaments }: Props) {
     const sectionRef = useRef<HTMLDivElement>(null)
     const [isVisible, setIsVisible] = useState(false)
     const [filter, setFilter] = useState<"all" | TournamentStatus>("all")
-
-    const {data: tournaments = [], isLoading} = useSWR<Tournament[]>("/api/tournaments", fetcher)
 
     useEffect(() => {
         const observer = new IntersectionObserver(
@@ -54,14 +39,6 @@ export function TournamentsSection() {
 
         return () => observer.disconnect()
     }, [])
-
-    const filteredTournaments = filter === "all" ? tournaments : tournaments.filter((t) => t.status === filter)
-
-    // Format date for display
-    const formatDate = (dateString: string) => {
-        const date = new Date(dateString)
-        return date.toLocaleDateString("ru-RU", {day: "numeric", month: "long", year: "numeric"})
-    }
 
     return (
         <section id="tournaments" ref={sectionRef} className="relative py-32 bg-background">
@@ -121,15 +98,10 @@ export function TournamentsSection() {
                     </div>
 
                     {/* Loading State */}
-                    {isLoading && (
-                        <div className="p-12 text-center text-muted-foreground">
-                            <div className="animate-pulse">Загрузка турниров...</div>
-                        </div>
-                    )}
 
                     {/* Tournament Rows */}
                     <div className="divide-y divide-border">
-                        {filteredTournaments.map((tournament, index) => (
+                        {tournaments.map((tournament, index) => (
                             <Link
                                 key={tournament.id}
                                 href={`/tournaments/${tournament.slug}`}
@@ -149,7 +121,7 @@ export function TournamentsSection() {
                                         <h3 className="font-bold text-foreground group-hover:text-primary transition-colors">
                                             {tournament.name}
                                         </h3>
-                                        <p className="text-sm text-muted-foreground">{tournament.game}</p>
+                                        <p className="text-sm text-muted-foreground">{tournament.game.name}</p>
                                     </div>
                                 </div>
 
@@ -191,7 +163,7 @@ export function TournamentsSection() {
                     </div>
 
                     {/* Empty State */}
-                    {!isLoading && filteredTournaments.length === 0 && (
+                    {tournaments.length === 0 && (
                         <div className="p-12 text-center text-muted-foreground">Турниры не найдены</div>
                     )}
                 </div>

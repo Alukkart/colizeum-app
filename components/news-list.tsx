@@ -1,53 +1,25 @@
 "use client"
 
-import {useState} from "react"
 import Link from "next/link"
 import Image from "next/image"
-import {Calendar, Eye, User, ChevronRight, Star} from "lucide-react"
-import {cn} from "@/lib/utils"
-import useSWR from "swr";
-import {fetcher} from "@/constants/fetcher";
+import {Calendar, ChevronRight, Star, User} from "lucide-react"
+import {cn} from "@/lib/utils";
 import {notFound} from "next/navigation";
+import {News, NewsTag} from "@/prisma/generated/client";
 
-interface NewsItem {
-    id: string
-    slug: string
-    title: string
-    excerpt: string
-    image?: string
-    category: string
-    publishedAt?: string
-    views: number
-    authorName?: string
-    authorAvatar?: string
-    featured: boolean
+interface NewsListProps {
+    news: News[]
+    tags: NewsTag[]
+    activeTag?: string
 }
 
-const categories = ["Все", "Турниры", "Оборудование", "Партнёры", "Анонсы"]
 
-export function NewsList() {
-    const {data: news, isLoading} = useSWR<NewsItem[]>(`/api/news`, fetcher)
-    const [filter, setFilter] = useState("Все")
-
-    if (!news && !isLoading) {
+export function NewsList({news, tags, activeTag}: NewsListProps) {
+    if (!news) {
         return notFound()
     }
 
-    if (isLoading) {
-        return (
-            <div className="max-w-4xl mx-auto px-6 py-12">
-                <p className="text-center text-muted-foreground">Загрузка новости...</p>
-            </div>
-        )
-    }
-
-    if(!news){
-        return null
-    }
-
-    const filteredNews = news.filter((n) => filter === "Все" || n.category === filter)
-    const featuredNews = filteredNews.find((n) => n.featured)
-    const regularNews = filteredNews.filter((n) => !n.featured || n.id !== featuredNews?.id)
+    const featuredNews = news.find((item) => item.featured)
 
     return (
         <div className="max-w-7xl mx-auto px-6 py-12">
@@ -61,19 +33,17 @@ export function NewsList() {
 
             {/* Category Filters */}
             <div className="flex flex-wrap gap-2 mb-10">
-                {categories.map((category) => (
-                    <button
-                        key={category}
-                        onClick={() => setFilter(category)}
+                {tags.map((tag) => (
+                    <Link
+                        key={tag.name}
+                        href={`/news?tag=${tag.name}`}
                         className={cn(
                             "px-4 py-2 text-sm font-medium rounded-lg border transition-all duration-300",
-                            filter === category
-                                ? "bg-primary text-primary-foreground border-primary"
-                                : "bg-card text-muted-foreground border-border hover:border-primary/50",
+                            activeTag === tag.name ? "bg-primary text-primary-foreground border-primary" : "bg-card text-muted-foreground border-border hover:border-primary/50",
                         )}
                     >
-                        {category}
-                    </button>
+                        {tag.name}
+                    </Link>
                 ))}
             </div>
 
@@ -96,14 +66,13 @@ export function NewsList() {
 
                     <div className="absolute bottom-0 left-0 right-0 p-6 md:p-10">
                         <div className="flex items-center gap-3 mb-4">
-              <span
-                  className="flex items-center gap-1 px-3 py-1 bg-primary/20 text-primary text-xs font-semibold rounded-lg border border-primary/30">
-                <Star className="w-3 h-3"/>
-                Главное
-              </span>
+                            <span className="flex items-center gap-1 px-3 py-1 bg-primary/20 text-primary text-xs font-semibold rounded-lg border border-primary/30">
+                                <Star className="w-3 h-3"/>
+                                Главное
+                            </span>
                             <span className="px-3 py-1 bg-card/80 text-foreground text-xs font-medium rounded-lg">
-                {featuredNews.category}
-              </span>
+                                {featuredNews.category}
+                            </span>
                         </div>
 
                         <h2 className="text-2xl md:text-4xl font-black text-foreground mb-4 group-hover:text-primary transition-colors">
@@ -128,10 +97,6 @@ export function NewsList() {
                                     })}
                                 </div>
                             )}
-                            <div className="flex items-center gap-2">
-                                <Eye className="w-4 h-4"/>
-                                {featuredNews.views}
-                            </div>
                         </div>
                     </div>
                 </Link>
@@ -139,12 +104,12 @@ export function NewsList() {
 
             {/* News Grid */}
             <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {regularNews.length === 0 && !featuredNews ? (
+                {news.length === 0 ? (
                     <div className="col-span-full text-center py-20 text-muted-foreground">
                         <p>Новости не найдены</p>
                     </div>
                 ) : (
-                    regularNews.map((item, index) => (
+                    news.map((item, index) => (
                         <Link
                             key={item.id}
                             href={`/news/${item.slug}`}
@@ -182,10 +147,6 @@ export function NewsList() {
                                                 })}
                                             </span>
                                         )}
-                                        <span className="flex items-center gap-1">
-                                            <Eye className="w-3 h-3"/>
-                                            {item.views}
-                                        </span>
                                     </div>
                                     <ChevronRight className="w-4 h-4 group-hover:translate-x-1 transition-transform"/>
                                 </div>
