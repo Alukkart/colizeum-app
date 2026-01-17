@@ -1,4 +1,4 @@
-import { PrismaClient } from '@/prisma/generated/client'
+import {ComponentCategory, DeviceCategory, PrismaClient} from '@/prisma/generated/client'
 import { PrismaPg } from '@prisma/adapter-pg'
 import { databaseUrl } from '@/prisma.config'
 
@@ -8,6 +8,61 @@ const adapter = new PrismaPg({
 
 const prisma = new PrismaClient({ adapter })
 
+const zones = [
+    {
+        slug: 'standard',
+        name: 'Standard',
+        price: '~120₽ / час',
+        description: 'Бюджетный вариант для комфортной игры',
+        image: '/zones/standard.jpg',
+        components: [
+            { category: ComponentCategory.cpu, model: 'i5-12400F', specs: '6 cores' },
+            { category: ComponentCategory.gpu, model: 'RTX 2060', specs: '6GB' },
+            { category: ComponentCategory.monitor, model: 'ASUS', specs: '27" 165Hz' },
+        ],
+        devices: [
+            { category: DeviceCategory.mouse, model: 'Logitech G 102', specs: 'Mercury 9800' },
+            { category: DeviceCategory.keyboard, model: 'ASUS K3', specs: 'Mechanical' },
+            { category: DeviceCategory.headset, model: 'ASUS H3', specs: 'Stereo' },
+        ],
+    },
+
+    {
+        slug: 'bootcamp',
+        name: 'Bootcamp',
+        price: '~130₽ / час',
+        description: 'Бюджетный вариант для комфортной игры',
+        image: '/zones/standard.jpg',
+        components: [
+            { category: ComponentCategory.cpu, model: 'i5-12400F', specs: '6 cores' },
+            { category: ComponentCategory.gpu, model: 'RTX 2060', specs: '6GB' },
+            { category: ComponentCategory.monitor, model: 'ASUS', specs: '27" 165Hz' },
+        ],
+        devices: [
+            { category: DeviceCategory.mouse, model: 'Logitech G 102', specs: 'Mercury 9800' },
+            { category: DeviceCategory.keyboard, model: 'ASUS K3', specs: 'Mechanical' },
+            { category: DeviceCategory.headset, model: 'HyperX Cloud II', specs: 'Stereo' },
+        ],
+    },
+
+    {
+        slug: 'bootcamp-plus',
+        name: 'Bootcamp+',
+        price: '~160₽ / час',
+        description: 'Бюджетный вариант для комфортной игры',
+        image: '/zones/standard.jpg',
+        components: [
+            { category: ComponentCategory.cpu, model: 'i5-12400F', specs: '6 cores' },
+            { category: ComponentCategory.gpu, model: 'RTX 3060', specs: '12GB' },
+            { category: ComponentCategory.monitor, model: 'ASUS', specs: '27" 280Hz' },
+        ],
+        devices: [
+            { category: DeviceCategory.mouse, model: 'Logitech G 102', specs: 'Mercury 9800' },
+            { category: DeviceCategory.keyboard, model: 'ASUS K3', specs: 'Mechanical' },
+            { category: DeviceCategory.headset, model: 'HyperX Cloud II', specs: 'Stereo' },
+        ],
+    },
+]
 async function main() {
     console.log('🧹 Clearing database...')
     await prisma.match.deleteMany({})
@@ -19,58 +74,38 @@ async function main() {
     console.log('✅ Database cleared')
 
     /* -------------------- ZONES -------------------- */
-    await prisma.zone.createMany({
-        data: [
-            {
-                slug: 'bootcamp',
-                name: 'Bootcamp',
-                description: 'Профессиональная зона для командных тренировок',
-                image: '/zones/bootcamp.jpg',
-                price: '1500₽ / час',
+    for (const zone of zones) {
+        const createdZone = await prisma.zone.create({
+            data: {
+                slug: zone.slug,
+                name: zone.name,
+                description: zone.description,
+                image: zone.image,
+                price: zone.price,
             },
-            {
-                slug: 'arena',
-                name: 'Arena',
-                description: 'Основная игровая зона для пабликов',
-                image: '/zones/arena.jpg',
-                price: '300₽ / час',
-            },
-            {
-                slug: 'vip',
-                name: 'VIP Zone',
-                description: 'Премиум зона с топовым железом',
-                image: '/zones/vip.jpg',
-                price: '800₽ / час',
-            },
-        ],
-    })
+        })
 
-    const bootcamp = await prisma.zone.findUnique({ where: { slug: 'bootcamp' } })
-    const arena = await prisma.zone.findUnique({ where: { slug: 'arena' } })
-    const vip = await prisma.zone.findUnique({ where: { slug: 'vip' } })
-
-    for (const zone of [bootcamp!, arena!, vip!]) {
         await prisma.zoneComponent.createMany({
-            data: [
-                { zoneId: zone.id, category: 'gpu', model: 'RTX 4070', specs: '12GB', order: 1 },
-                { zoneId: zone.id, category: 'cpu', model: 'i7-13700K', specs: '16 cores', order: 2 },
-                { zoneId: zone.id, category: 'monitor', model: '240Hz', specs: '27"', order: 3 },
-            ],
+            data: zone.components.map((c, index) => ({
+                zoneId: createdZone.id,
+                order: index + 1,
+                ...c,
+            })),
         })
 
         await prisma.zoneDevice.createMany({
-            data: [
-                { zoneId: zone.id, category: 'mouse', model: 'Logitech G Pro', specs: 'Wireless', order: 1 },
-                { zoneId: zone.id, category: 'keyboard', model: 'SteelSeries Apex Pro', specs: 'Mechanical', order: 2 },
-                { zoneId: zone.id, category: 'headset', model: 'HyperX Cloud II', specs: '7.1', order: 3 },
-            ],
+            data: zone.devices.map((d, index) => ({
+                zoneId: createdZone.id,
+                order: index + 1,
+                ...d,
+            })),
         })
 
         await prisma.zonePhoto.create({
             data: {
-                zoneId: zone.id,
-                url: zone.image,
-                alt: zone.name,
+                zoneId: createdZone.id,
+                url: createdZone.image,
+                alt: createdZone.name,
                 order: 1,
             },
         })
