@@ -4,6 +4,8 @@ import type {PrismaClient} from "@premieroctet/next-admin";
 import PageLoader from "@premieroctet/next-admin/pageLoader";
 import {PromisePageProps} from "@premieroctet/next-admin";
 import options from "../../../../nextAdminOptions";
+import { redirect } from 'next/navigation'
+import { cookies } from 'next/headers'
 import prisma from "@/lib/prisma";
 import '../../admin.css'
 
@@ -19,6 +21,12 @@ export default async function AdminPage(props: PromisePageProps) {
         prisma: prisma as unknown as PrismaClient,
         options
     });
+
+    const isAuth = (await cookies()).get('admin_auth')?.value === 'true'
+
+    if (!isAuth) {
+        redirect('/login')
+    }
 
     return (
         <NextAdmin pageLoader={<PageLoader/>} {...nextAdminProps}  />

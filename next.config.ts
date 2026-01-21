@@ -15,6 +15,14 @@ const nextConfig: NextConfig = {
             '@prisma/client/runtime/library': '@prisma/client/runtime/client',
         },
     },
+    async rewrites() {
+        return [
+            {
+                source: '/admin/:path*',
+                destination: '/api/admin-proxy/:path*',
+            },
+        ]
+    },
 };
 
 export default nextConfig;
