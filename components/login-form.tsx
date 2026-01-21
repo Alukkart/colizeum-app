@@ -45,7 +45,8 @@ export function LoginForm({className, ...props}: React.ComponentProps<"div">) {
                 <CardContent>
                     <form onSubmit={submit}>
                         <FieldGroup>
-                            <Field>
+                            <Field>        const form = e.currentTarget
+
                                 <FieldLabel htmlFor="username">Username</FieldLabel>
                                 <Input
                                     id="username"
