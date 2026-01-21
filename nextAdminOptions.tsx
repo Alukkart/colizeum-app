@@ -8,7 +8,6 @@ const options: NextAdminOptions = {
             label: 'На главную'
         }
     ],
-    model: {}
 }
 
 export default options;
