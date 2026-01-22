@@ -73,6 +73,13 @@ async function main() {
     await prisma.game.deleteMany({})
     console.log('✅ Database cleared')
 
+    await prisma.admins.create({
+        data: {
+            username: 'admin',
+            password: 'admin',
+        }
+    })
+
     /* -------------------- ZONES -------------------- */
     for (const zone of zones) {
         const createdZone = await prisma.zone.create({

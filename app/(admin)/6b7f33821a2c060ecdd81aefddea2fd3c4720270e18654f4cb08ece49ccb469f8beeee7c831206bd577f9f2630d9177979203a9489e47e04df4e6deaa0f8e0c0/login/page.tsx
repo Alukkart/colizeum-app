@@ -1,6 +1,7 @@
 'use client'
 
 import {LoginForm} from "@/components/login-form";
+import '../../../(main)/globals.css'
 
 export default function LoginPage() {
     return (

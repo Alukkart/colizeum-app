@@ -1,10 +1,12 @@
 import { NextResponse } from 'next/server'
+import prisma from "@/lib/prisma";
 
 export async function POST(req: Request) {
     const { login, password } = await req.json()
 
-    // ⚠️ Простейшая проверка (для примера)
-    if (login === 'admin' && password === '1234') {
+    const dbUser = await prisma.admins.findUnique({ where: {username: login} })
+
+    if (dbUser && dbUser.password === password) {
         const response = NextResponse.json({ success: true })
 
         response.cookies.set('admin_auth', 'true', {
