@@ -19,12 +19,23 @@ export async function GET(request: Request, { params }: { params: Promise<{ slug
         const tournament = await prisma.tournament.findUnique({
             where: { slug },
             include:{
-                participants: {
+                matches: {
                     include: {
-                        player: true
+                        teamA: true,
+                        teamB: true
                     }
                 },
-                matches: true
+                teams: {
+                    include: {
+                        team: true,
+                    }
+                },
+                game: true,
+                _count: {
+                    select: {
+                        teams: true,
+                    }
+                }
             }
         })
 

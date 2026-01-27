@@ -1,5 +1,5 @@
 import {axiosInstance} from "@/service/instance";
-import {PlayerExtended} from "@/service/DTO/players";
+import {PlayerExtended, PlayerFull} from "@/service/DTO/players";
 
 const baseUrl = '/players';
 
@@ -9,8 +9,8 @@ export const getPlayers = async (page: number = 1, limit: number = 6) => {
     return data;
 }
 
-export const getPlayer = async (id: string) => {
-    const {data} = await axiosInstance.get(`${baseUrl}/${id}`);
+export const getPlayer = async (nickname: string) => {
+    const {data} = await axiosInstance.get<PlayerFull>(`${baseUrl}/${nickname}`);
 
     return data;
 }

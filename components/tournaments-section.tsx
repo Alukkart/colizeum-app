@@ -4,8 +4,8 @@ import {useRef, useState, useEffect} from "react"
 import {Calendar, Users, Trophy, ChevronRight} from "lucide-react"
 import {cn, formatDate} from "@/lib/utils"
 import Link from "next/link"
-import {TournamentWithGame} from "@/service/tournaments";
 import {TournamentStatus} from "@/prisma/generated/enums";
+import {TournamentWithGame} from "@/service/DTO/tournament";
 
 const statusConfig = {
     REGISTRATION: {label: "Регистрация", color: "bg-primary text-primary-foreground"},
@@ -104,13 +104,13 @@ export function TournamentsSection({ tournaments }: Props) {
                         {tournaments.map((tournament, index) => (
                             <Link
                                 key={tournament.id}
-                                href={`/app/(main)/tournaments/${tournament.slug}`}
+                                href={`/tournaments/${tournament.slug}`}
                                 className="group grid grid-cols-1 lg:grid-cols-12 gap-4 px-6 py-5 hover:bg-secondary/30 transition-all duration-300 cursor-pointer"
                                 style={{transitionDelay: `${index * 50}ms`}}
                             >
                                 {/* Tournament Info */}
                                 <div className="lg:col-span-4 flex items-center gap-4">
-                                    <div className="relative w-16 h-16 rounded-lg overflow-hidden flex-shrink-0">
+                                    <div className="relative w-16 h-16 rounded-lg overflow-hidden shrink-0">
                                         <img
                                             src={tournament.image || "/placeholder.svg?height=64&width=64&query=esports tournament"}
                                             alt={tournament.name}
@@ -139,7 +139,7 @@ export function TournamentsSection({ tournaments }: Props) {
                                 <div className="lg:col-span-2 flex items-center gap-2">
                                     <Users className="w-4 h-4 text-muted-foreground"/>
                                     <span className="text-sm text-foreground">
-                                        {tournament.currentParticipants}/{tournament.maxParticipants}
+                                        {tournament._count.teams}/{tournament.maxParticipants}
                                     </span>
                                 </div>
 

@@ -9,7 +9,6 @@ export async function GET() {
             }
         })
 
-        console.log("Fetched zones:", zones)
         return NextResponse.json({zones})
     } catch (error) {
         console.error("Error fetching zones:", error)

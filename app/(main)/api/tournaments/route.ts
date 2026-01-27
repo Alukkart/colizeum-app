@@ -19,6 +19,11 @@ export async function GET(req: Request) {
                 },
                 include: {
                     game: true,
+                    _count: {
+                        select: {
+                            teams: true,
+                        }
+                    }
                 },
             }),
             prisma.tournament.count(),

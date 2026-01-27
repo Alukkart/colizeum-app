@@ -1,4 +1,4 @@
-import {ComponentCategory, DeviceCategory, PrismaClient} from '@/prisma/generated/client'
+import {ComponentCategory, DeviceCategory, MatchStatus, PrismaClient, TournamentStatus} from '@/prisma/generated/client'
 import { PrismaPg } from '@prisma/adapter-pg'
 import { databaseUrl } from '@/prisma.config'
 
@@ -71,6 +71,7 @@ async function main() {
     await prisma.zone.deleteMany({})
     await prisma.tournament.deleteMany({})
     await prisma.game.deleteMany({})
+    await prisma.admins.deleteMany({})
     console.log('✅ Database cleared')
 
     await prisma.admins.create({
@@ -119,117 +120,101 @@ async function main() {
     }
 
     /* -------------------- GAMES -------------------- */
-    const [cs2, dota] = await Promise.all([
+    const [cs2] = await Promise.all([
         prisma.game.create({ data: { name: 'CS2' } }),
         prisma.game.create({ data: { name: 'Dota 2' } }),
         prisma.game.create({ data: { name: 'Valorant' } }),
     ])
 
     /* -------------------- PLAYERS -------------------- */
-    const players = await Promise.all([
-        prisma.player.create({
-            data: {
-                username: 'onetap',
-                nickname: 'OneTap',
-                email: 'one@mail.com',
-                rating: 1450,
-                achievements: {
-                    create: [
-                        { name: 'First Blood', description: 'Первая победа' },
-                        { name: 'Sharpshooter', description: '100 хедшотов', rarity: 'RARE' },
-                    ],
-                },
-                socialLinks: {
-                    create: [
-                        { platform: 'steam', url: 'https://steamcommunity.com/id/onetap' },
-                    ],
-                },
-            },
-        }),
-        prisma.player.create({
-            data: { username: 'clutch', nickname: 'ClutchKing', rating: 1380 },
-        }),
-        prisma.player.create({
-            data: { username: 'sniper', nickname: 'DeadEye', rating: 1520 },
-        }),
-        prisma.player.create({
-            data: { username: 'support', nickname: 'Anchor', rating: 1300 },
-        }),
-        prisma.player.create({
-            data: { username: 'igl', nickname: 'Brain', rating: 1600 },
-        }),
-        prisma.player.create({
-            data: { username: 'rookie', nickname: 'Newbie', rating: 950 },
-        }),
-    ])
+    const players = await Promise.all(
+        Array.from({ length: 10 }).map((_, i) =>
+            prisma.player.create({
+                data: {
+                    nickname: `player${i + 1}`,
+                    rating: 1000 + i * 25
+                }
+            })
+        )
+    )
 
-    /* -------------------- TOURNAMENTS -------------------- */
-    const cs2Tournament = await prisma.tournament.create({
+    // ---------- Teams ----------
+    const teams = await Promise.all(
+        ['Alpha', 'Bravo', 'Charlie', 'Delta'].map((name) =>
+            prisma.team.create({
+                data: {
+                    name: `${name} Team`,
+                    tag: name.toUpperCase()
+                }
+            })
+        )
+    )
+
+    // ---------- Team Players ----------
+    await Promise.all(
+        teams.map((team, index) => {
+            const slice = players.slice(index * 2, index * 2 + 2)
+
+            return Promise.all(
+                slice.map(player =>
+                    prisma.teamPlayer.create({
+                        data: {
+                            teamId: team.id,
+                            userId: player.id
+                        }
+                    })
+                )
+            )
+        })
+    )
+
+    // ---------- Tournament ----------
+    const tournament = await prisma.tournament.create({
         data: {
             slug: 'cs2-winter-cup',
             name: 'CS2 Winter Cup',
-            description: 'Зимний турнир для лучших игроков',
-            date: new Date('2026-02-10'),
+            description: 'Winter tournament for CS2 teams',
+            date: new Date('2026-02-15'),
             time: '18:00',
-            prize: '100 000 ₽',
-            maxParticipants: 16,
-            image: '/tournaments/cs2.jpg',
-            gameId: cs2.id,
-            status: 'REGISTRATION',
-            participants: {
-                create: players.slice(0, 4).map((p) => ({ playerId: p.id })),
-            },
-        },
+            prize: '$1,000',
+            maxParticipants: 8,
+            status: TournamentStatus.REGISTRATION,
+            gameId: cs2.id
+        }
     })
 
-    const dotaTournament = await prisma.tournament.create({
-        data: {
-            slug: 'dota-spring-open',
-            name: 'Dota 2 Spring Open',
-            date: new Date('2026-03-15'),
-            time: '17:00',
-            prize: '200 000 ₽',
-            maxParticipants: 32,
-            status: 'ONGOING',
-            gameId: dota.id,
-            participants: {
-                create: players.map((p) => ({ playerId: p.id })),
-            },
-        },
-    })
+    // ---------- Tournament Teams ----------
+    await Promise.all(
+        teams.map(team =>
+            prisma.tournamentTeam.create({
+                data: {
+                    tournamentId: tournament.id,
+                    teamId: team.id,
+                }
+            })
+        )
+    )
 
-    /* -------------------- MATCHES -------------------- */
+    // ---------- Matches ----------
     await prisma.match.createMany({
         data: [
             {
-                game: 'CS2',
-                map: 'Mirage',
-                score: '16-12',
-                duration: 42,
-                tournamentId: cs2Tournament.id,
-                player1Id: players[0].id,
-                player2Id: players[1].id,
-                winnerId: players[0].id,
+                tournamentId: tournament.id,
+                round: 1,
+                bestOf: 3,
+                status: MatchStatus.SCHEDULED,
+                teamAId: teams[0].id,
+                teamBId: teams[1].id
             },
             {
-                game: 'Dota 2',
-                score: '2-1',
-                duration: 65,
-                tournamentId: dotaTournament.id,
-                player1Id: players[2].id,
-                player2Id: players[3].id,
-                winnerId: players[2].id,
-            },
-            {
-                game: 'CS2',
-                map: 'Inferno',
-                score: '16-14',
-                duration: 50,
-                player1Id: players[4].id,
-                player2Id: players[5].id,
-                winnerId: players[4].id,
-            },
-        ],
+                tournamentId: tournament.id,
+                round: 1,
+                bestOf: 3,
+                status: MatchStatus.SCHEDULED,
+                teamAId: teams[2].id,
+                teamBId: teams[3].id
+            }
+        ]
     })
 
     /* -------------------- NEWS -------------------- */

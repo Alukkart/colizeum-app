@@ -23,6 +23,12 @@ enum DeviceCategory {
   headset
 }
 
+enum MatchStatus {
+  SCHEDULED
+  LIVE
+  COMPLETED
+}
+
 model Zone {
   id          Int   @id @default(autoincrement())
   slug        String   @unique
@@ -78,20 +84,86 @@ model Tournament {
   status              TournamentStatus @default(REGISTRATION)
   prize               String
   maxParticipants     Int
-  currentParticipants Int              @default(0)
   image               String?
   rules               String?
   streamUrl           String?
   createdAt           DateTime         @default(now())
   updatedAt           DateTime         @updatedAt
 
-  // Relations
-  participants     TournamentPlayer[]
-  matches          Match[]
+  gameId              Int
+  game                Game @relation(fields: [gameId], references: [id])
 
-  gameId           Int
-  game             Game @relation(fields: [gameId], references: [id])
+  matches             Match[]
+  teams               TournamentTeam[]
 }
+
+model TournamentTeam {
+  id           String   @id @default(uuid())
+  placement    Int?
+  tournamentId String
+  teamId       String
+  registeredAt DateTime @default(now())
+
+  tournament   Tournament @relation(fields: [tournamentId], references: [id])
+  team         Team       @relation(fields: [teamId], references: [id])
+
+  @@unique([tournamentId, teamId])
+}
+
+model Team {
+  id        String   @id @default(uuid())
+  name      String
+  tag       String   @unique
+  logo      String?
+  createdAt DateTime @default(now())
+
+  players   TeamPlayer[]
+
+  matchesAsA Match[] @relation("TeamA")
+  matchesAsB Match[] @relation("TeamB")
+  wins       Match[] @relation("Winner")
+
+  tournaments TournamentTeam[]
+}
+
+
+model TeamPlayer {
+  id        String   @id @default(uuid())
+  teamId    String
+  userId    String
+
+  team      Team @relation(fields: [teamId], references: [id])
+  user      Player @relation(fields: [userId], references: [id])
+
+  @@unique([teamId, userId])
+}
+
+model Match {
+  id            String   @id @default(uuid())
+  tournamentId  String
+  map           String?
+  duration      Int?
+  round         Int
+  bestOf        Int
+  status        MatchStatus @default(SCHEDULED)
+  startTime     DateTime?
+
+  teamAId       String
+  teamBId       String
+  winnerId      String?
+
+  scoreA        Int?
+  scoreB        Int?
+
+  tournament    Tournament @relation(fields: [tournamentId], references: [id])
+
+  teamA         Team @relation("TeamA", fields: [teamAId], references: [id])
+  teamB         Team @relation("TeamB", fields: [teamBId], references: [id])
+  winner        Team? @relation("Winner", fields: [winnerId], references: [id])
+
+  @@index([tournamentId])
+}
+
 
 model Game {
   id          Int       @id @default(autoincrement())
@@ -108,9 +180,7 @@ enum TournamentStatus {
 
 model Player {
   id        String   @id @default(uuid(4))
-  username  String   @unique
-  nickname  String
-  email     String?  @unique
+  nickname  String   @unique
   avatar    String?
   rating    Int      @default(1000)
   rank      Int?
@@ -118,12 +188,10 @@ model Player {
   updatedAt DateTime @updatedAt
 
   // Relations
-  tournaments      TournamentPlayer[]
-  matchesAsPlayer1 Match[]             @relation("Player1Matches")
-  matchesAsPlayer2 Match[]             @relation("Player2Matches")
-  matchesWon       Match[]             @relation("WinnerMatches")
   achievements     PlayerAchievement[]
   socialLinks      PlayerSocialLink[]
+
+  teamPlayers TeamPlayer[]
 }
 
 model PlayerAchievement {
@@ -135,42 +203,6 @@ model PlayerAchievement {
   earnedAt    DateTime          @default(now())
   playerId    String
   player      Player            @relation(fields: [playerId], references: [id], onDelete: Cascade)
-}
-
-model TournamentPlayer {
-  id           String   @id @default(uuid(4))
-  placement    Int?
-  prizeWon     String?
-  registeredAt DateTime @default(now())
-
-  tournamentId String
-  tournament   Tournament @relation(fields: [tournamentId], references: [id], onDelete: Cascade)
-
-  playerId String
-  player   Player @relation(fields: [playerId], references: [id], onDelete: Cascade)
-
-  @@unique([tournamentId, playerId])
-}
-
-model Match {
-  id       String   @id @default(uuid(4))
-  game     String
-  map      String?
-  score    String? // e.g., "16-12" or "2-1"
-  duration Int? // in minutes
-  playedAt DateTime @default(now())
-
-  tournamentId String?
-  tournament   Tournament? @relation(fields: [tournamentId], references: [id], onDelete: SetNull)
-
-  player1Id String
-  player1   Player @relation("Player1Matches", fields: [player1Id], references: [id], onDelete: Cascade)
-
-  player2Id String
-  player2   Player @relation("Player2Matches", fields: [player2Id], references: [id], onDelete: Cascade)
-
-  winnerId String?
-  winner   Player? @relation("WinnerMatches", fields: [winnerId], references: [id], onDelete: SetNull)
 }
 
 enum AchievementRarity {

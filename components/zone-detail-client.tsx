@@ -15,23 +15,9 @@ import {
 } from "lucide-react"
 import {cn} from "@/lib/utils"
 import {Button} from "@/components/ui/button"
-import useSWR from "swr";
 import {notFound} from "next/navigation";
 import Image from "next/image"
-
-export type ZoneWithRelations = {
-    id: string
-    slug: string
-    name: string
-    description: string
-    image: string
-    price: string
-    color: string
-    specs: { id: string; name: string }[]
-    components: { id: string; category: string; name: string; model: string; specs: string }[]
-    devices: { id: string; category: string; name: string; model: string; specs: string }[]
-    photos: { id: string; url: string; alt: string; order: number }[]
-}
+import {ZoneFull} from "@/service/zones";
 
 const componentIcons: Record<string, typeof Monitor> = {
     gpu: Gpu,
@@ -54,20 +40,12 @@ const categoryLabels: Record<string, string> = {
     headset: "Наушники",
 }
 
-const fetcher = (url: string) => fetch(url).then((res) => res.json())
-
-
-export function ZoneDetailClient({slug}: { slug: string }) {
+export function ZoneDetailClient({zone}: { zone: ZoneFull }) {
     const [lightboxOpen, setLightboxOpen] = useState(false)
     const [currentPhotoIndex, setCurrentPhotoIndex] = useState(0)
-    const {data: zone, isLoading} = useSWR<ZoneWithRelations>(`/api/zones/${slug}`, fetcher)
 
-    if (!zone && !isLoading) {
+    if (!zone) {
         return notFound()
-    }
-
-    if (isLoading || !zone) {
-        return <div className="py-32 text-center text-muted-foreground">Загрузка...</div>
     }
 
     const openLightbox = (index: number) => {

@@ -7,7 +7,7 @@ import {Calendar, Users, Trophy, Clock, Play, ChevronRight, Filter} from "lucide
 import {cn} from "@/lib/utils"
 import {type TournamentStatus} from "@/prisma/generated/enums";
 import {Game} from "@/prisma/generated/client";
-import {TournamentWithGame} from "@/service/tournaments";
+import {TournamentWithGame} from "@/service/DTO/tournament";
 
 const statusConfig: Record<TournamentStatus, { label: string; color: string }> = {
     REGISTRATION: {label: "Регистрация", color: "bg-emerald-500/20 text-emerald-400 border-emerald-500/30"},
@@ -101,7 +101,7 @@ export function TournamentsList({tournaments, gameFilters}: Props) {
                     filteredTournaments.map((tournament, index) => (
                         <Link
                             key={tournament.id}
-                            href={`/app/(main)/tournaments/${tournament.slug}`}
+                            href={`/tournaments/${tournament.slug}`}
                             className="group relative bg-card border border-border rounded-2xl overflow-hidden hover:border-primary/50 transition-all duration-500"
                             style={{animationDelay: `${index * 100}ms`}}
                         >
@@ -115,7 +115,7 @@ export function TournamentsList({tournaments, gameFilters}: Props) {
                                         className="object-cover transition-transform duration-700 group-hover:scale-110"
                                     />
                                     <div
-                                        className="absolute inset-0 bg-gradient-to-r from-transparent to-card/80 md:block hidden"/>
+                                        className="absolute inset-0 bg-linear-to-r from-transparent to-card/80 md:block hidden"/>
 
                                     {/* Status Badge */}
                                     <div className="absolute top-4 left-4">
@@ -169,7 +169,7 @@ export function TournamentsList({tournaments, gameFilters}: Props) {
                                         </div>
                                         <div className="flex items-center gap-2">
                                             <Users className="w-4 h-4"/>
-                                            {tournament.currentParticipants}/{tournament.maxParticipants}
+                                            {tournament._count.teams}/{tournament.maxParticipants}
                                         </div>
                                         <div className="flex items-center gap-2 text-primary font-semibold">
                                             <Trophy className="w-4 h-4"/>

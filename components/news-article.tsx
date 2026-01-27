@@ -2,60 +2,14 @@
 
 import Image from "next/image"
 import Link from "next/link"
-import {Calendar, Eye, ArrowLeft, Tag} from "lucide-react"
-import useSWR from "swr";
+import {Calendar, ArrowLeft, Tag} from "lucide-react"
 import {notFound} from "next/navigation";
+import {NewsWithTags} from "@/service/news";
 
-interface NewsTag {
-    id: string
-    name: string
-}
+export function NewsArticle({article}: { article: NewsWithTags }) {
 
-interface RelatedNews {
-    id: string
-    slug: string
-    title: string
-    excerpt: string
-    image?: string
-    category: string
-    publishedAt?: string
-}
-
-interface Article {
-    id: string
-    slug: string
-    title: string
-    excerpt: string
-    content: string
-    image?: string
-    category: string
-    publishedAt?: string
-    views: number
-    authorName?: string
-    authorAvatar?: string
-    tags: NewsTag[]
-    relatedNews: RelatedNews[]
-}
-
-const fetcher = (url: string) => fetch(url).then((res) => res.json())
-
-export function NewsArticle({slug}: { slug: string }) {
-    const {data: article, isLoading} = useSWR<Article>(`/api/news/${slug}`, fetcher)
-
-    if (!article && !isLoading) {
+    if (!article) {
         return notFound()
-    }
-
-    if (isLoading) {
-        return (
-            <div className="max-w-4xl mx-auto px-6 py-12">
-                <p className="text-center text-muted-foreground">Загрузка новости...</p>
-            </div>
-        )
-    }
-
-    if(!article){
-        return null
     }
 
     return (
@@ -110,10 +64,6 @@ export function NewsArticle({slug}: { slug: string }) {
                         </div>
                     </div>
                 )}
-                <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                    <Eye className="w-4 h-4"/>
-                    {article.views} просмотров
-                </div>
             </div>
 
             {/* Hero Image */}

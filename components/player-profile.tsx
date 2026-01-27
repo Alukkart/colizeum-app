@@ -9,9 +9,8 @@ import {
 } from "lucide-react"
 import {cn} from "@/lib/utils"
 import Link from "next/link"
-import useSWR from "swr";
-import {Player, PlayerAchievement, Tournament, TournamentPlayer} from "@/prisma/generated/client";
 import {notFound} from "next/navigation";
+import {PlayerFull} from "@/service/DTO/players";
 
 const rarityColors = {
     legendary: "from-amber-400 to-orange-500",
@@ -20,20 +19,7 @@ const rarityColors = {
     common: "from-gray-400 to-gray-500",
 }
 
-interface TournamentFull extends TournamentPlayer {
-    tournament: Tournament
-}
-
-interface PlayerProfile extends Player {
-    tournaments: TournamentFull[]
-    achievements: PlayerAchievement[]
-}
-
-const fetcher = (url: string) => fetch(url).then((res) => res.json())
-
-export function PlayerProfile({username}: { username: string }) {
-    const {data: player, isLoading} = useSWR<PlayerProfile>(`/api/players/${username}`, fetcher)
-
+export function PlayerProfile({player}: { player: PlayerFull }) {
     const [isVisible, setIsVisible] = useState(false)
     const [activeTab, setActiveTab] = useState<"tournaments" | "achievements">("tournaments")
 
@@ -41,13 +27,11 @@ export function PlayerProfile({username}: { username: string }) {
         setIsVisible(true)
     }, [])
 
-    if (!isLoading && !player) {
+    if (!player) {
         notFound()
     }
 
-    if (!player) {
-        return null
-    }
+    const tournaments = player.teamPlayers.flatMap(tp => tp.team.tournaments)
 
     return (
         <div className="pt-20 pb-20">
@@ -142,9 +126,10 @@ export function PlayerProfile({username}: { username: string }) {
                             <div className="p-6 bg-card rounded-xl border border-border">
                                 <h3 className="text-lg font-bold text-foreground mb-6">История турниров</h3>
                                 <div className="space-y-4">
-                                    {player.tournaments.map((tournament) => (
-                                        <div
-                                            key={tournament.id}
+                                    {tournaments.map((tournament) => (
+                                        <Link
+                                            key={tournament.tournament.id}
+                                            href={`/tournaments/${tournament.tournament.slug}`}
                                             className="flex items-center justify-between p-5 bg-secondary/50 rounded-xl hover:bg-secondary transition-colors group"
                                         >
                                             <div className="flex items-center gap-4">
@@ -165,8 +150,7 @@ export function PlayerProfile({username}: { username: string }) {
                                                         className="font-semibold text-foreground group-hover:text-primary transition-colors">
                                                         {tournament.tournament.name}
                                                     </div>
-                                                    <div
-                                                        className="text-sm text-muted-foreground">{new Date(tournament.tournament.date).toLocaleDateString()}</div>
+                                                    <div className="text-sm text-muted-foreground">{new Date(tournament.tournament.date).toLocaleDateString()}</div>
                                                 </div>
                                             </div>
                                             <div className="text-right">
@@ -174,7 +158,7 @@ export function PlayerProfile({username}: { username: string }) {
                                                     className="font-bold text-primary">{tournament.tournament.prize}</div>
                                                 <div className="text-xs text-muted-foreground">Приз</div>
                                             </div>
-                                        </div>
+                                        </Link>
                                     ))}
                                 </div>
                             </div>

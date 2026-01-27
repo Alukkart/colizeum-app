@@ -18,7 +18,7 @@ const options: NextAdminOptions = {
             },
             {
                 title: 'Турниры',
-                models: ["Game", "Tournament", "TournamentPlayer", "Match"],
+                models: ["Game", "Tournament", "TournamentTeam", "Match"],
                 className: sidebarGroupCN
             },
             {

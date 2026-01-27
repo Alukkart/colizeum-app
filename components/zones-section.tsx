@@ -63,7 +63,7 @@ export function ZonesSection({zones}: Props) {
                         {zones?.map((zone) => (
                             <Link
                                 key={zone.id}
-                                href={`/app/(main)/zones/${zone.slug}`}
+                                href={`/zones/${zone.slug}`}
                                 onMouseEnter={() => setIsHovered(zone.slug)}
                                 onMouseLeave={() => setIsHovered(null)}
                                 className={cn(
