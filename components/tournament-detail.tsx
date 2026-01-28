@@ -15,7 +15,7 @@ import {
     CheckCircle,
     Swords,
     MapPin,
-    Timer,
+    Timer, Medal,
 } from "lucide-react"
 import {cn} from "@/lib/utils"
 import {notFound} from "next/navigation";
@@ -143,52 +143,52 @@ export function TournamentDetail({tournament}: { tournament: TournamentFull }) {
                                 </p>
                             </div>
 
-                            {/*/!* Top 3 *!/*/}
-                            {/*{tournament.teams.filter((p) => p.placement && p.placement <= 3).length > 0 && (*/}
-                            {/*    <div className="bg-card border border-border rounded-2xl p-6">*/}
-                            {/*        <h2 className="text-xl font-bold text-foreground mb-4">Призёры</h2>*/}
-                            {/*        <div className="grid grid-cols-3 gap-4">*/}
-                            {/*            {[2, 1, 3].map((place) => {*/}
-                            {/*                const winner = tournament.participants.find((p) => p.placement === place)*/}
-                            {/*                if (!winner) return null*/}
-                            {/*                return (*/}
-                            {/*                    <div*/}
-                            {/*                        key={place}*/}
-                            {/*                        className={cn(*/}
-                            {/*                            "text-center p-4 rounded-xl",*/}
-                            {/*                            place === 1 && "bg-amber-500/10 border border-amber-500/30",*/}
-                            {/*                            place === 2 && "bg-zinc-400/10 border border-zinc-400/30",*/}
-                            {/*                            place === 3 && "bg-amber-700/10 border border-amber-700/30",*/}
-                            {/*                        )}*/}
-                            {/*                    >*/}
-                            {/*                        <Medal*/}
-                            {/*                            className={cn(*/}
-                            {/*                                "w-8 h-8 mx-auto mb-2",*/}
-                            {/*                                place === 1 && "text-amber-400",*/}
-                            {/*                                place === 2 && "text-zinc-400",*/}
-                            {/*                                place === 3 && "text-amber-700",*/}
-                            {/*                            )}*/}
-                            {/*                        />*/}
-                            {/*                        <div*/}
-                            {/*                            className="relative w-16 h-16 mx-auto mb-2 rounded-full overflow-hidden border-2 border-border">*/}
-                            {/*                            <Image*/}
-                            {/*                                src={winner.player.avatar || "/placeholder.svg?height=64&width=64&query=gamer avatar"}*/}
-                            {/*                                alt={winner.player.nickname}*/}
-                            {/*                                fill*/}
-                            {/*                                className="object-cover"*/}
-                            {/*                            />*/}
-                            {/*                        </div>*/}
-                            {/*                        <p className="font-bold text-foreground">{winner.player.nickname}</p>*/}
-                            {/*                        <p className="text-xs text-muted-foreground">@{winner.player.username}</p>*/}
-                            {/*                        {winner.prizeWon && (*/}
-                            {/*                            <p className="text-sm text-primary font-semibold mt-1">{winner.prizeWon}</p>*/}
-                            {/*                        )}*/}
-                            {/*                    </div>*/}
-                            {/*                )*/}
-                            {/*            })}*/}
-                            {/*        </div>*/}
-                            {/*    </div>*/}
-                            {/*)}*/}
+                            {/* Top 3 */}
+                            {tournament.teams.filter((p) => p.placement && p.placement <= 3).length > 0 && (
+                                <div className="bg-card border border-border rounded-2xl p-6">
+                                    <h2 className="text-xl font-bold text-foreground mb-4">Призёры</h2>
+                                    <div className="grid grid-cols-3 gap-4">
+                                        {[2, 1, 3].map((place) => {
+                                            const winner = tournament.teams.find((p) => p.placement === place)
+                                            if (!winner) return null
+                                            return (
+                                                <div
+                                                    key={place}
+                                                    className={cn(
+                                                        "text-center p-4 rounded-xl",
+                                                        place === 1 && "bg-amber-500/10 border border-amber-500/30",
+                                                        place === 2 && "bg-zinc-400/10 border border-zinc-400/30",
+                                                        place === 3 && "bg-amber-700/10 border border-amber-700/30",
+                                                    )}
+                                                >
+                                                    <Medal
+                                                        className={cn(
+                                                            "w-8 h-8 mx-auto mb-2",
+                                                            place === 1 && "text-amber-400",
+                                                            place === 2 && "text-zinc-400",
+                                                            place === 3 && "text-amber-700",
+                                                        )}
+                                                    />
+                                                    <div
+                                                        className="relative w-16 h-16 mx-auto mb-2 rounded-full overflow-hidden border-2 border-border">
+                                                        <Image
+                                                            src={winner.team.logo || "/placeholder.svg?height=64&width=64&query=gamer avatar"}
+                                                            alt={winner.team.name}
+                                                            fill
+                                                            className="object-cover"
+                                                        />
+                                                    </div>
+                                                    <p className="font-bold text-foreground">{winner.team.name}</p>
+                                                    <p className="text-xs text-muted-foreground">{winner.team.tag}</p>
+                                                    {/*{winner. && (*/}
+                                                    {/*    <p className="text-sm text-primary font-semibold mt-1">{winner.prizeWon}</p>*/}
+                                                    {/*)}*/}
+                                                </div>
+                                            )
+                                        })}
+                                    </div>
+                                </div>
+                            )}
 
                         </div>
 
@@ -213,9 +213,7 @@ export function TournamentDetail({tournament}: { tournament: TournamentFull }) {
                     <div className="bg-card border border-border rounded-2xl overflow-hidden">
                         <div
                             className="grid grid-cols-12 gap-4 p-4 bg-muted/50 text-sm font-medium text-muted-foreground border-b border-border">
-                            <div className="col-span-1">#</div>
-                            <div className="col-span-5">Игрок</div>
-                            <div className="col-span-2 text-center">Рейтинг</div>
+                            <div className="col-span-5">Команда</div>
                             <div className="col-span-2 text-center">Место</div>
                             <div className="col-span-2 text-right">Приз</div>
                         </div>
@@ -225,13 +223,12 @@ export function TournamentDetail({tournament}: { tournament: TournamentFull }) {
                                 <p>Команды пока не зарегистрированы</p>
                             </div>
                         ) : (
-                            tournament.teams.map((team, idx) => (
+                            tournament.teams.map((team) => (
                                 <Link
                                     key={team.id}
-                                    href={`/team/${team.team.tag}`}
+                                    href={`/teams/${team.team.tag}`}
                                     className="grid grid-cols-12 gap-4 p-4 items-center hover:bg-muted/30 transition-colors border-b border-border last:border-0"
                                 >
-                                    <div className="col-span-1 text-muted-foreground">{idx + 1}</div>
                                     <div className="col-span-5 flex items-center gap-3">
                                         <div
                                             className="relative w-10 h-10 rounded-full overflow-hidden border border-border">
@@ -247,25 +244,24 @@ export function TournamentDetail({tournament}: { tournament: TournamentFull }) {
                                             <p className="text-xs text-muted-foreground">{team.team.tag}</p>
                                         </div>
                                     </div>
-                                    {/*<div className="col-span-2 text-center font-mono text-foreground">{team.player.rating}</div>*/}
-                                    {/*<div className="col-span-2 text-center">*/}
-                                    {/*    {participant.placement ? (*/}
-                                    {/*        <span*/}
-                                    {/*            className={cn(*/}
-                                    {/*                "px-2 py-1 rounded text-sm font-bold",*/}
-                                    {/*                participant.placement === 1 && "bg-amber-500/20 text-amber-400",*/}
-                                    {/*                participant.placement === 2 && "bg-zinc-400/20 text-zinc-400",*/}
-                                    {/*                participant.placement === 3 && "bg-amber-700/20 text-amber-600",*/}
-                                    {/*                participant.placement > 3 && "text-muted-foreground",*/}
-                                    {/*            )}*/}
-                                    {/*        >*/}
-                                    {/*            #{participant.placement}*/}
-                                    {/*        </span>*/}
-                                    {/*    ) : (*/}
-                                    {/*        <span className="text-muted-foreground">—</span>*/}
-                                    {/*    )}*/}
-                                    {/*</div>*/}
-                                    {/*<div className="col-span-2 text-right text-primary font-semibold">{participant.prizeWon || "—"}</div>*/}
+                                    <div className="col-span-2 text-center">
+                                        {team.placement ? (
+                                            <span
+                                                className={cn(
+                                                    "px-2 py-1 rounded text-sm font-bold",
+                                                    team.placement === 1 && "bg-amber-500/20 text-amber-400",
+                                                    team.placement === 2 && "bg-zinc-400/20 text-zinc-400",
+                                                    team.placement === 3 && "bg-amber-700/20 text-amber-600",
+                                                    team.placement > 3 && "text-muted-foreground",
+                                                )}
+                                            >
+                                                #{team.placement}
+                                            </span>
+                                        ) : (
+                                            <span className="text-muted-foreground">—</span>
+                                        )}
+                                    </div>
+                                    {/*<div className="col-span-2 text-right text-primary font-semibold">{team.prizeWon || "—"}</div>*/}
                                 </Link>
                             ))
                         )}

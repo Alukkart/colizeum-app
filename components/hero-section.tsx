@@ -21,9 +21,9 @@ export function HeroSection() {
                     loop
                     playsInline
                     className="w-full h-full object-cover"
-                    poster="/dark-esports-gaming-arena-with-neon-lights.jpg"
+                    poster="/hero.jpg"
                 >
-                    <source src="/esports-tournament-video.jpg" type="video/mp4"/>
+                    <source src="/herovid.jpg" type="video/mp4"/>
                 </video>
                 {/* Overlay */}
                 <div className="absolute inset-0 bg-linear-to-b from-background/80 via-background/60 to-background"/>

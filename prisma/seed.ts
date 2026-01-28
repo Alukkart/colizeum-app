@@ -14,7 +14,7 @@ const zones = [
         name: 'Standard',
         price: '~120₽ / час',
         description: 'Бюджетный вариант для комфортной игры',
-        image: '/zones/standard.jpg',
+        image: '/temp/zones/standard.png',
         components: [
             { category: ComponentCategory.cpu, model: 'i5-12400F', specs: '6 cores' },
             { category: ComponentCategory.gpu, model: 'RTX 2060', specs: '6GB' },
@@ -32,7 +32,7 @@ const zones = [
         name: 'Bootcamp',
         price: '~130₽ / час',
         description: 'Бюджетный вариант для комфортной игры',
-        image: '/zones/standard.jpg',
+        image: '/temp/zones/bootcamp.png',
         components: [
             { category: ComponentCategory.cpu, model: 'i5-12400F', specs: '6 cores' },
             { category: ComponentCategory.gpu, model: 'RTX 2060', specs: '6GB' },
@@ -50,7 +50,7 @@ const zones = [
         name: 'Bootcamp+',
         price: '~160₽ / час',
         description: 'Бюджетный вариант для комфортной игры',
-        image: '/zones/standard.jpg',
+        image: '/temp/zones/bootcamp-plus.png',
         components: [
             { category: ComponentCategory.cpu, model: 'i5-12400F', specs: '6 cores' },
             { category: ComponentCategory.gpu, model: 'RTX 3060', specs: '12GB' },
@@ -65,12 +65,24 @@ const zones = [
 ]
 async function main() {
     console.log('🧹 Clearing database...')
+    await prisma.tournamentTeam.deleteMany({})
     await prisma.match.deleteMany({})
-    await prisma.news.deleteMany({})
-    await prisma.player.deleteMany({})
-    await prisma.zone.deleteMany({})
     await prisma.tournament.deleteMany({})
     await prisma.game.deleteMany({})
+
+    await prisma.teamPlayer.deleteMany({})
+    await prisma.team.deleteMany({})
+    await prisma.playerSocialLink.deleteMany({})
+    await prisma.player.deleteMany({})
+
+    await prisma.news.deleteMany({})
+    await prisma.newsTag.deleteMany({})
+
+    await prisma.zone.deleteMany({})
+    await prisma.zoneComponent.deleteMany({})
+    await prisma.zoneDevice.deleteMany({})
+    await prisma.zonePhoto.deleteMany({})
+
     await prisma.admins.deleteMany({})
     console.log('✅ Database cleared')
 
@@ -120,7 +132,7 @@ async function main() {
     }
 
     /* -------------------- GAMES -------------------- */
-    const [cs2] = await Promise.all([
+    const [cs2, _dota, valorant] = await Promise.all([
         prisma.game.create({ data: { name: 'CS2' } }),
         prisma.game.create({ data: { name: 'Dota 2' } }),
         prisma.game.create({ data: { name: 'Valorant' } }),
@@ -132,6 +144,7 @@ async function main() {
             prisma.player.create({
                 data: {
                     nickname: `player${i + 1}`,
+                    avatar: `/temp/players/simple.jpg`,
                     rating: 1000 + i * 25
                 }
             })
@@ -143,6 +156,7 @@ async function main() {
         ['Alpha', 'Bravo', 'Charlie', 'Delta'].map((name) =>
             prisma.team.create({
                 data: {
+                    logo: '/temp/teams/team-liquid.png',
                     name: `${name} Team`,
                     tag: name.toUpperCase()
                 }
@@ -169,17 +183,33 @@ async function main() {
     )
 
     // ---------- Tournament ----------
-    const tournament = await prisma.tournament.create({
+    const tournamentCS2 = await prisma.tournament.create({
         data: {
             slug: 'cs2-winter-cup',
             name: 'CS2 Winter Cup',
+            image: '/temp/tournaments/cs2-winter-cup.jpg',
             description: 'Winter tournament for CS2 teams',
             date: new Date('2026-02-15'),
             time: '18:00',
             prize: '$1,000',
             maxParticipants: 8,
-            status: TournamentStatus.REGISTRATION,
+            status: TournamentStatus.ONGOING,
             gameId: cs2.id
+        }
+    })
+
+    await prisma.tournament.create({
+        data: {
+            slug: 'valorant-spring-showdown',
+            name: 'Valorant Spring Showdown',
+            image: '/temp/tournaments/valorant.jpg',
+            description: 'Spring tournament for Valorant teams',
+            date: new Date('2026-04-10'),
+            time: '19:00',
+            prize: '$2,000',
+            maxParticipants: 16,
+            status: TournamentStatus.REGISTRATION,
+            gameId: valorant.id
         }
     })
 
@@ -188,7 +218,7 @@ async function main() {
         teams.map(team =>
             prisma.tournamentTeam.create({
                 data: {
-                    tournamentId: tournament.id,
+                    tournamentId: tournamentCS2.id,
                     teamId: team.id,
                 }
             })
@@ -199,15 +229,23 @@ async function main() {
     await prisma.match.createMany({
         data: [
             {
-                tournamentId: tournament.id,
+                tournamentId: tournamentCS2.id,
+                map: 'de_dust2',
+                duration: 35,
+                startTime: new Date(),
                 round: 1,
                 bestOf: 3,
-                status: MatchStatus.SCHEDULED,
+                status: MatchStatus.COMPLETED,
+                scoreA: 100,
+                scoreB: 75,
+                winnerId: teams[0].id,
                 teamAId: teams[0].id,
                 teamBId: teams[1].id
             },
             {
-                tournamentId: tournament.id,
+                tournamentId: tournamentCS2.id,
+                map: 'de_inferno',
+                startTime: new Date(),
                 round: 1,
                 bestOf: 3,
                 status: MatchStatus.SCHEDULED,
