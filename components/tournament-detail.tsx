@@ -228,7 +228,7 @@ export function TournamentDetail({tournament}: { tournament: TournamentFull }) {
                             tournament.teams.map((team, idx) => (
                                 <Link
                                     key={team.id}
-                                    href={`/profile/${team.team.tag}`}
+                                    href={`/team/${team.team.tag}`}
                                     className="grid grid-cols-12 gap-4 p-4 items-center hover:bg-muted/30 transition-colors border-b border-border last:border-0"
                                 >
                                     <div className="col-span-1 text-muted-foreground">{idx + 1}</div>
@@ -310,7 +310,7 @@ export function TournamentDetail({tournament}: { tournament: TournamentFull }) {
 
                                     <div className="flex items-center justify-between">
                                         {/* Team A */}
-                                        <Link href={`/team/${match.teamA.tag}`}
+                                        <Link href={`/teams/${match.teamA.tag}`}
                                               className="flex items-center gap-3 group">
                                             <div
                                                 className="relative w-12 h-12 rounded-full overflow-hidden border-2 border-border group-hover:border-primary transition-colors">
@@ -341,7 +341,7 @@ export function TournamentDetail({tournament}: { tournament: TournamentFull }) {
 
                                         {/* Team B */}
                                         <Link
-                                            href={`/team/${match.teamB.tag}`}
+                                            href={`/teams/${match.teamB.tag}`}
                                             className="flex items-center gap-3 group flex-row-reverse"
                                         >
                                             <div
